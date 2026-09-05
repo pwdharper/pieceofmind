@@ -19,12 +19,53 @@
 
 테마: 생크림, 치즈, 딸기, 말차, 블루베리, 초코
 
+## 페이지 이동
+
+하루에 기록은 날짜당 1개입니다. 로그인 여부는 주소를 바꾸지 않습니다.
+
+| 주소 | 화면 | 하단 탭 |
+| --- | --- | --- |
+| `/` | 홈. 오늘 작성/수정 | 있음 |
+| `/insights` | 통계 | 있음 |
+| `/settings` | 설정 (로그아웃/로그인 UI만 다름) | 있음 |
+| `/entries/:id` | 기록 상세 + AI 분석 | 없음. 수정/닫기 |
+| `/entries/:id/edit` | 기록 수정 | 없음. 뒤로/저장 |
+
+- 탭: 홈 ↔ 통계 ↔ 설정
+- 홈에서 오늘 저장(또는 갱신) → 기록 상세. 이때 상세 AI를 한 번 만들어 기록에 붙임
+- 통계 달력에서 점이 있는 날 → 그 날 상세. 오늘이고 점 없음 → 홈. 지난날이고 점 없음 → 그대로
+- 상세 → 수정 → 저장하면 다시 상세. 닫기/뒤로면 이전 화면(홈 또는 통계)
+- 설정에서 가입/로그인 성공 → 게스트 기록을 합친 뒤 같은 `/settings`를 로그인 화면으로 바꿈. 홈으로 보내지 않음
+- 없는 주소나 없는 기록 id → `/`
+
+흐름을 바꾸려면 `src/app/routes`와 각 화면의 `navigate(...)`를 보면 됩니다.
+
 ## 디자인
+
+Figma는 첫 구현의 출발점입니다. 코드로 화면을 본 뒤에 색, 간격, 구조, 문구를 조금씩 고칩니다.
+감정 얼굴 8종과 케이크 테마 그림 6종은 Figma 그림을 최종 에셋으로 쓰지 않습니다. 자리만 맞춰 두고 파일만 교체합니다.
 
 - 화면/IA: [ver.3](https://figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-554)
 - 케이크 테마 색: [Cake Themes](https://figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=19-63)
 - 홈 AI 한 줄: [ai-feedback-row](https://figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-68)
 - 기록 상세 AI 분석: [ai-section](https://figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=56-28)
+
+## 어디를 고치면 되나요
+
+화면 파일에 색 코드나 절대 위치를 넣지 않습니다. 바꾸고 싶은 것만 아래 파일을 엽니다.
+
+| 바꾸고 싶은 것 | 여는 파일 |
+| --- | --- |
+| 전체 배경, 포인트색, 글자색 | `src/theme/tokens.css` |
+| 케이크 6색 (생크림, 치즈 등) | `src/theme/cakes.ts` |
+| 여백, 모서리, 버튼 높이 | `src/theme/tokens.css` (`--space-*`, `--radius-*`, `--tap`) |
+| 감정 칸 크기·열 수 | `src/components/EmotionGrid` |
+| 하단 탭 | `src/components/BottomNav` |
+| 저장 버튼 모양 | `src/components/AppButton` |
+| 홈 블록 순서 (인사 / 감정 / 일기 / 버튼) | `src/screens/Home` 에서 컴포넌트 줄 순서 |
+| 페이지 이동 | `src/app/routes`, 각 화면의 `navigate(...)` |
+| 감정 그림, 케이크 그림 | `src/assets/emotions`, `src/assets/cakes` 파일만 교체 |
+| 한/영 문구 | `src/i18n` |
 
 ## 기술 스택
 
@@ -99,11 +140,13 @@ ANTHROPIC_API_KEY=
 - `src/shell` — 402px PhoneShell
 - `src/screens` — Home, Insights, Settings, 기록 상세/수정
 - `src/components` — 하단 탭, 감정 그리드, 케이크 피커
-- `src/theme` — 케이크 6종 CSS 변수
+- `src/theme` — 색/간격/라운드/글자 + 케이크 6종. 디자인 수정의 첫 파일
+- `src/i18n` — 한/영 문구
 - `src/domain` — Emotion, Entry, ThemeId, Locale
 - `src/platform` — Auth/Entry/File/AI 포트. 게스트=local, 로그인=supabase
 - `api` — `/api/ai-copy` (Claude, 서버 전용)
-- `src/assets` — Figma에서 받은 아이콘·케이크·얼굴
+- `src/assets/emotions` — 감정 8종. 키로만 읽고 파일만 갈아끼움
+- `src/assets/cakes` — 케이크 6종. 키로만 읽고 파일만 갈아끼움
 
 ## 배포 (Vercel, 수동만)
 
