@@ -57,6 +57,18 @@ const FALLBACKS: Record<Emotion, DetailAi> = {
   },
 };
 
-export function fallbackDetailAi(emotion: Emotion): DetailAi {
-  return FALLBACKS[emotion];
+function hashText(text: string): number {
+  let hash = 0;
+  for (const char of text) hash = (hash * 31 + char.charCodeAt(0)) | 0;
+  return Math.abs(hash);
+}
+
+export function fallbackDetailAi(emotion: Emotion, text = ""): DetailAi {
+  const base = FALLBACKS[emotion];
+  const salt = hashText(text.trim());
+  return {
+    aiLabel: base.aiLabel,
+    aiPercent: 70 + (salt % 19),
+    aiMessage: base.aiMessage,
+  };
 }

@@ -40,20 +40,13 @@ export function listEntries(): Entry[] {
 export function upsertEntry(partial: Omit<Entry, "id"> & { id?: string }): Entry {
   const entries = readAll();
   const existing = entries.find((entry) => entry.date === partial.date);
-  const ai = existing?.aiLabel
-    ? {
-        aiLabel: existing.aiLabel,
-        aiPercent: existing.aiPercent,
-        aiMessage: existing.aiMessage,
-      }
-    : fallbackDetailAi(partial.emotion);
   const next: Entry = {
     id: existing?.id ?? partial.id ?? crypto.randomUUID(),
     date: partial.date,
     emotion: partial.emotion,
     text: partial.text,
     photoUrl: partial.photoUrl,
-    ...ai,
+    ...fallbackDetailAi(partial.emotion, partial.text),
   };
   const others = entries.filter((entry) => entry.date !== partial.date);
   writeAll([next, ...others]);

@@ -28,7 +28,6 @@ function HomeComposer({ date }: { date: string }) {
   const location = useLocation();
   const composer = useEntryComposer();
   const tip = useMemo(() => pickHomeTip(), []);
-  const isToday = date === todayKey();
 
   function handleSave() {
     if (!composer.emotion || !composer.text.trim()) return;
@@ -52,7 +51,7 @@ function HomeComposer({ date }: { date: string }) {
             <AppButton disabled={!composer.canSave} onClick={handleSave}>
               저장
             </AppButton>
-            {isToday ? <AiTip text={tip} /> : null}
+            <AiTip text={tip} />
           </div>
         }
       />

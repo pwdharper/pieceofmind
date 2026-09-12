@@ -72,35 +72,22 @@
 }
 
 .emotion-icon {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  color: var(--text);
+  overflow: clip;
+  border-radius: 50%;
 }
 
-.emotion-disk {
-  fill: none;
-  stroke: currentColor;
+.emotion-icon.is-colored {
+  background: currentColor;
 }
 
-.emotion-mark {
-  fill: currentColor;
-}
-
-.emotion-line {
-  fill: none;
-  stroke: currentColor;
-}
-
-.emotion-icon.is-colored .emotion-disk {
-  fill: currentColor;
-}
-
-.emotion-icon.is-colored .emotion-mark {
-  fill: var(--text);
-}
-
-.emotion-icon.is-colored .emotion-line {
-  stroke: var(--text);
+.emotion-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .sketchbook {
@@ -199,8 +186,8 @@
 }
 
 .ai-tip-face img {
-  width: 18px;
-  height: 18px;
+  width: 32px;
+  height: 32px;
 }
 
 .media-error {

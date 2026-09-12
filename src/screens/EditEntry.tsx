@@ -42,14 +42,14 @@ function EditForm({
 
   function handleSave() {
     if (!composer.emotion || !composer.text.trim()) return;
-    upsertEntry({
+    const saved = upsertEntry({
       id: entry.id,
       date: entry.date,
       emotion: composer.emotion,
       text: composer.text.trim(),
       photoUrl: composer.photoUrl,
     });
-    navigate(originPath(from), { state: originState(from) });
+    navigate(`/entries/${saved.id}`, { state: { from } });
   }
 
   return (

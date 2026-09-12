@@ -1,7 +1,7 @@
 # Piece of Mind
 
 하루에 감정 한 조각을 남기는 모바일 웹 일기장입니다.
-로그인하지 않아도 기록을 저장할 수 있고, 회원가입/로그인 후에는 같은 기록이 계정에 저장됩니다.
+지금은 이 브라우저의 localStorage에 저장됩니다. 설정 로그인은 이 기기 세션만 기억하고, 계정 저장(Supabase)과 기록 상세 Claude 분석은 아래 목표 스택입니다.
 
 모바일 브라우저와 데스크톱 브라우저에서 모두 동작합니다.
 화면은 Figma 모바일 프레임(402px)이 기준이며, 데스크톱에서는 가운데 폰 캔버스로 보입니다.
@@ -9,17 +9,15 @@
 
 ## 지금 되는 것
 
-- 홈: 오늘 감정, 일기(200자), 사진, 음성(발화→입력란), 저장. 오늘 글을 저장하기 전에만 랜덤 안내 한 줄
-- 기록 상세: 그날의 조각, 사진, 로컬 폴백 AI 문구. 홈에서 보면 수정만, 통계에서 보면 수정/닫기
-- 기록 수정: 같은 날 기록을 고침
-- 통계: 달력, Flow, Mood Breakdown, 화면 이미지 저장
-- 설정: 이메일 로그인(이 기기 세션만), 테마(생크림/치즈), 언어(설정 화면 한/영)
+- 홈: 날짜, 감정 2×4(라벨 없음), 일기(200자), 사진, 음성(Web Speech `ko-KR` → 입력란), 저장. 아직 없는 날을 처음 쓸 때만 랜덤 안내 한 줄. 안내 아이콘은 설정에서 고른 케이크
+- 기록 상세: 그날의 감정 얼굴, 글, 사진, 로컬 폴백 AI. 라벨은 `'{이름}' {n}% 포착` (앞에 `AI 분석 :` 없음). 아이콘은 고른 케이크. 홈에서 보면 수정만, 통계에서 보면 뒤로/수정/닫기
+- 기록 수정: 같은 날 감정·글·사진을 고침. 저장하면 기록 상세로 가고, AI는 그때의 감정·글로 다시 붙임
+- 통계: 달력(기록 있는 날에 감정 얼굴), Flow, Mood Breakdown, 화면 이미지 저장. 없는 날을 누르면 그 날짜 작성 화면(홈과 같은 안내 한 줄)
+- 설정: 이메일 로그인(이 기기 세션만), 구글/카카오는 “곧 연결할게요.”, 테마(생크림/치즈), 언어(설정 화면 한/영만)
 
 감정: 행복, 평온, 설렘, 불안, 슬픔, 화남, 피곤, 무기력
 
-테마: 생크림케이크, 치즈케이크
-
-지금은 이 브라우저의 localStorage로 동작합니다. 계정 저장(Supabase)과 기록 상세 Claude 분석은 아래 목표 스택입니다.
+테마: 생크림케이크, 치즈케이크. 없는 테마 값이 있으면 생크림으로 돌아감
 
 ## 페이지 이동
 
@@ -28,19 +26,22 @@
 | 주소 | 화면 | 하단 탭 |
 | --- | --- | --- |
 | `/` | 홈. 오늘 기록이 없으면 작성, 있으면 그날 상세 | 있음 |
+| `/?date=YYYY-MM-DD` | 그 날짜 작성. 이미 있으면 그날 상세 | 있음 |
 | `/insights` | 통계 | 있음 |
 | `/settings` | 설정 | 있음 |
 | `/entries/:id` | 기록 상세 | 있음 |
 | `/entries/:id/edit` | 기록 수정 | 없음 |
 
-- 탭: 홈 ↔ 통계 ↔ 설정
-- 홈에서 저장하면 기록 상세. 이미 저장된 날의 홈/하단 홈 탭도 기록 상세
+- 탭: 홈 ↔ 통계 ↔ 설정. 기록 상세에서는 들어온 곳(홈/통계) 탭이 켜짐
+- 홈에서 저장하면 기록 상세. 수정에서 저장해도 기록 상세(통계에서 고친 뒤에도 통계로 바로 돌아가지 않음)
+- 이미 저장된 날의 홈/하단 홈 탭도 기록 상세
 - 통계 달력에서 기록이 있는 날 → 기록 상세. 없는 날 → 그 날짜 작성 화면
 - 수정은 기록 상세의 수정으로만 들어갑니다. 하단 탭은 수정 화면에서만 숨깁니다
-- 설정에서 가입/로그인 성공 → 게스트 기록을 합친 뒤 같은 `/settings`를 로그인 화면으로 바꿈. 홈으로 보내지 않음
+- 기록 상세 홈에서 봄: 뒤로 없음, 닫기 없음, 수정만. 통계에서 봄: 뒤로·닫기·수정
+- 설정 로그인/회원가입은 이 기기 `pom.session`만 바꿈. 화면은 `/settings`에 남음. 게스트 기록 합치기는 아직 없음
 - 없는 주소나 없는 기록 id → `/`
 
-흐름은 `src/app/App.tsx`와 각 화면의 `navigate(...)`를 보면 됩니다.
+흐름은 `src/app/App.tsx`와 각 화면의 `navigate(...)`를 보면 됩니다. 들어온 곳은 `src/lib/navFrom.ts`의 `from: "home" | "insights"`입니다.
 
 ## 기술 스택
 
@@ -51,8 +52,8 @@
 | 호스팅 | Vercel (수동) | Git 자동 배포 없음. 배포 요청이 있을 때만 `npx vercel` |
 | 계정/기록 | Supabase Auth + Postgres + Storage | 로컬 개발 가능, 이후 다른 백엔드로 갈아타기 쉬움 |
 | 비로그인 기록 | localStorage | 가입 없이 바로 사용 |
-| 홈 하단 안내 | 로컬 문구 풀 랜덤 | 오늘 첫 작성·저장 전에만. Claude 아님 |
-| 기록 상세 AI | Claude API (`ai` + `@ai-sdk/anthropic`) | 저장 시 한 번. 키는 서버만 |
+| 홈 하단 안내 | 로컬 문구 풀 랜덤 | 그 날짜를 처음 쓸 때만. Claude 아님 |
+| 기록 상세 AI | 지금은 로컬 폴백. 목표는 Claude (`ai` + `@ai-sdk/anthropic`) | 첫 저장과 수정 저장마다 다시. 키는 서버만 |
 | 앱 (이후) | Capacitor 또는 PWA | 웹 화면을 그대로 래핑. Expo로 다시 그리지 않음 |
 
 화면 코드는 벤더 SDK를 직접 부르지 않습니다.
@@ -78,11 +79,23 @@
 
 지금은 Claude를 부르지 않고 로컬 문구를 씁니다.
 
-1. **홈 하단 안내** ([45:68](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-68), Home `45:555` 안) — 오늘 글을 아직 저장하기 전, 처음 쓸 때만. `src/content/homeTips.ts` 문구 풀에서 랜덤 1개. 저장하면 숨김. 예: `감정을 기록하면 마음이 가벼워져요.` Claude를 부르지 않습니다.
-2. **기록 상세 분석** ([56:28](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=56-28)) — 헤더 예: `AI 분석: '보람찬 행복' 82% 포착` + 공감 말풍선. 지금은 `src/content/detailAi.ts` 폴백을 기록에 붙입니다.
+1. **홈 하단 안내** ([45:68](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-68), Home `45:555` 안) — 그 날짜 기록이 아직 없을 때, 작성 화면에만. 오늘(`/`)이든 통계에서 빈 날을 눌러 연 `/?date=`든 같습니다. `src/content/homeTips.ts` 문구 풀에서 랜덤 1개. 아이콘은 `ThemeCakeIcon`(설정 케이크). 저장하면 기록 상세로 가서 이 줄은 숨김. 예: `감정을 기록하면 마음이 가벼워져요.` Claude를 부르지 않습니다.
+2. **기록 상세 분석** ([56:28](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=56-28)) — `'{보람찬 행복}' 82% 포착` + 공감 말풍선. 아이콘은 같은 케이크. `src/content/detailAi.ts` 폴백을 `upsertEntry`가 붙입니다. 감정으로 이름·말풍선을 고르고, 글 해시로 포착 %(70–88)를 정합니다. 첫 저장과 수정 저장마다 다시 계산해서, 고친 데이터 기준 피드백이 상세에 보입니다.
 
 이후에는 Claude가 기록 상세 문구를 만듭니다. `ANTHROPIC_API_KEY`는 서버 환경 변수만 쓰고, 프론트(`VITE_`)에는 넣지 않습니다.
 로컬에서는 `/api/ai-copy`로 호출합니다. 키가 없거나 호출이 실패하면 Figma 톤의 짧은 폴백 문구를 보여 칸이 비지 않게 합니다.
+
+## 감정 아이콘
+
+Figma 얼굴을 `src/assets/emotions/*.svg`로 두고 `EmotionIcon`이 `<img>`로 그립니다. 기본 잎은 64px(`--emotion-size`). 고르면 그 감정 색 원이 뒤에 깔립니다. 얼굴은 64 박스 안 가운데(~55px)에 맞춰 두었습니다.
+
+| 쓰는 곳 | 크기 |
+| --- | --- |
+| 홈·수정 그리드 | 64px |
+| 기록 상세 | 72px |
+| 통계 달력 | 16px |
+
+불안·무기력은 아래 노드의 새 얼굴입니다. 나머지 여섯은 그리드 `45:23`에서 받은 파일입니다.
 
 ## 로컬에서 실행
 
@@ -131,28 +144,32 @@ ANTHROPIC_API_KEY=
 | 전체 배경, 포인트색, 글자색 | `src/theme/tokens.css` |
 | 케이크 2색 (생크림, 치즈) | `src/theme/cakes.ts` |
 | 여백, 모서리, 버튼 높이 | `src/theme/tokens.css` (`--space-*`, `--radius-*`, `--tap`) |
-| 감정 칸 크기·열 수 | `src/components/EmotionGrid` |
+| 감정 칸 기본 크기 | `src/theme/tokens.css` (`--emotion-size`) |
+| 감정 칸 열 수 | `src/components/EmotionGrid` |
 | 하단 탭 | `src/components/BottomNav` |
 | 저장 버튼 모양 | `src/components/AppButton` |
 | 홈 블록 순서 | `src/screens/Home`에서 컴포넌트 줄 순서 |
-| 페이지 이동 | `src/app/App.tsx`, 각 화면의 `navigate(...)` |
+| 페이지 이동 | `src/app/App.tsx`, 각 화면의 `navigate(...)`, `src/lib/navFrom.ts` |
 | 감정 그림 | `src/assets/emotions` 파일만 교체 |
 | 케이크 그림 | `src/assets/cakes` 파일만 교체 |
+| 홈 안내·상세 AI의 케이크 아이콘 | `src/components/ThemeCakeIcon.tsx` |
 | 설정 화면 한/영 문구 | `src/screens/Settings.tsx`의 `COPY` |
 | 홈 AI 팁 문구 풀 | `src/content/homeTips.ts` |
 | 기록 상세 AI 폴백 | `src/content/detailAi.ts` |
+| 저장 시 AI를 다시 붙이는 곳 | `src/platform/localEntries.ts`의 `upsertEntry` |
 
 ## 폴더
 
 - `src/shell` — 402px PhoneShell
 - `src/screens` — Home, Insights, Settings, 기록 상세/수정
-- `src/components` — 하단 탭, 감정 그리드, 작성 폼
+- `src/components` — 하단 탭, 감정 그리드, 작성 폼, `ThemeCakeIcon`
 - `src/theme` — 색/간격/라운드/글자 + 케이크 2종
 - `src/domain` — Emotion, Entry, ThemeId, Locale
 - `src/platform` — Auth/Entry/File/AI 포트. 지금은 게스트=localStorage, 이후 로그인=supabase
 - `src/content` — 홈 팁, 상세 AI 폴백
+- `src/lib` — 날짜, 통계, `navFrom`
 - `api` — `/api/ai-copy` (Claude, 서버 전용)
-- `src/assets/emotions` — 감정 8종
+- `src/assets/emotions` — 감정 8종 SVG
 - `src/assets/cakes` — 생크림, 치즈 (Figma 설정 화면과 같은 그림)
 
 ## 디자인
@@ -162,6 +179,9 @@ Figma는 구현의 출발점입니다. 설정 테마 카드는 [Setting (Logged 
 - 화면/IA: [ver.3](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-554)
 - 설정: [Setting (Logged Out)](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-561)
 - 케이크 테마 색: [Cake Themes](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=19-63)
+- 홈 감정 그리드: [45:23](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-23)
+- 불안 얼굴: [45:38](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-38)
+- 무기력 얼굴: [45:55](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-55)
 - 홈 AI 한 줄: [ai-feedback-row](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-68)
 - 기록 상세 AI 분석: [ai-section](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=56-28)
 

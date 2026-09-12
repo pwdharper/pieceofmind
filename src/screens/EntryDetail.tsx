@@ -1,6 +1,7 @@
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { AppHeader } from "../components/AppHeader";
 import { EmotionIcon } from "../components/EmotionIcon";
+import { ThemeCakeIcon } from "../components/ThemeCakeIcon";
 import { dateFromKey, formatKoreanDate } from "../lib/formatDate";
 import { originPath, originState, readNavFrom } from "../lib/navFrom";
 import { getById } from "../platform/localEntries";
@@ -39,11 +40,11 @@ export function EntryDetail() {
         <hr className="detail-rule" />
         <section className="detail-ai" aria-label="AI 분석">
           <div className="detail-ai-row">
-            <span className="ai-tip-face">
-              <EmotionIcon emotion={saved.emotion} colored size={18} />
+            <span className="ai-tip-face" aria-hidden>
+              <ThemeCakeIcon size={32} />
             </span>
             <p className="detail-ai-label">
-              AI 분석: '{saved.aiLabel ?? saved.emotion}' {saved.aiPercent ?? 80}% 포착
+              '{saved.aiLabel ?? saved.emotion}' {saved.aiPercent ?? 80}% 포착
             </p>
           </div>
           <p className="detail-ai-bubble">
