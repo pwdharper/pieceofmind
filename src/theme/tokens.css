@@ -1,0 +1,79 @@
+:root {
+  --bg: #fffdf9;
+  --text: #3a332c;
+  --muted: #9b9085;
+  --accent: #9d80a6;
+  --card-border: #c9c0b5;
+  --chip: #fff8ee;
+  --login-fill: #ebe1d2;
+  --cake-selected: #d2c3aa;
+  --sns-google: #ffffff;
+  --sns-kakao: #fee500;
+  --sns-kakao-text: #111827;
+  --tip-face: #fff9d4;
+  --ai-bubble: #ebf7ff;
+  --photo-hero: 280px;
+  --count: #8c8780;
+  --emotion-행복: #e4b423;
+  --emotion-평온: #6aa37a;
+  --emotion-설렘: #e3879b;
+  --emotion-불안: #8b7cc9;
+  --emotion-슬픔: #5b8ec9;
+  --emotion-화남: #d4654a;
+  --emotion-피곤: #c48a4a;
+  --emotion-무기력: #8a838c;
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 28px;
+  --radius-btn: 20px;
+  --radius-card: 16px;
+  --radius-face: 36px;
+  --tap: 44px;
+  --emotion-size: 58px;
+  --font-title: 22px;
+  --font-page: 20px;
+  --font-brand: 18px;
+  --font-body: 14px;
+  --font-small: 13px;
+  --font-tiny: 11px;
+  --shell-width: 402px;
+  --header-font: "Bricolage Grotesque", "Epilogue", sans-serif;
+  --body-font: "Epilogue", sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--body-font);
+  background: #ece7e1;
+  color: var(--text);
+}
+
+button,
+textarea,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

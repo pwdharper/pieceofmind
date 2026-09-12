@@ -1,0 +1,16 @@
+.phone-frame {
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  background: #ece7e1;
+}
+
+.phone-canvas {
+  width: 100%;
+  max-width: var(--shell-width);
+  height: 100dvh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}

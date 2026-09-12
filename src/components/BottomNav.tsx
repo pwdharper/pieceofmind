@@ -1,0 +1,66 @@
+import { matchPath, NavLink, useLocation } from "react-router-dom";
+import { readNavFrom } from "../lib/navFrom";
+import "./chrome.css";
+
+const tabs = [
+  { to: "/", label: "홈", end: true, icon: HomeIcon, key: "home" },
+  { to: "/insights", label: "통계", end: false, icon: ChartIcon, key: "insights" },
+  { to: "/settings", label: "설정", end: false, icon: GearIcon, key: "settings" },
+] as const;
+
+export function BottomNav() {
+  const location = useLocation();
+  if (location.pathname.endsWith("/edit")) return null;
+
+  const onDetail = Boolean(matchPath({ path: "/entries/:id", end: true }, location.pathname));
+  const from = readNavFrom(location.state);
+
+  return (
+    <nav className="bottom-nav" aria-label="주요 메뉴">
+      {tabs.map((tab) => (
+        <NavLink
+          key={tab.to}
+          to={tab.to}
+          end={tab.end}
+          className={({ isActive }) => {
+            const onThisOrigin = onDetail && tab.key === from;
+            return isActive || onThisOrigin ? "nav-tab is-active" : "nav-tab";
+          }}
+        >
+          <tab.icon />
+          {tab.label}
+        </NavLink>
+      ))}
+    </nav>
+  );
+}
+
+function HomeIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+      <path d="M3 9.2L10 3l7 6.2V17H3V9.2z" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+function ChartIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+      <path d="M4 16V9M10 16V4M16 16v-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function GearIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden>
+      <circle cx="10" cy="10" r="2.2" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M10 3.2v1.6M10 15.2v1.6M3.2 10h1.6M15.2 10h1.6M5.2 5.2l1.1 1.1M13.7 13.7l1.1 1.1M14.8 5.2l-1.1 1.1M6.3 13.7l-1.1 1.1"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
