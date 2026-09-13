@@ -48,6 +48,10 @@ export const UI = {
       nextMonth: "다음 달",
       weekdays: ["일", "월", "화", "수", "목", "금", "토"],
       empty: "아직 기록이 없어요.",
+      calendar: "달력",
+      mood: "감정 분석",
+      entries: "기록",
+      ranges: { week: "이번주", month: "이번달", year: "올해" },
     },
     speech: {
       unsupported: "이 브라우저에서는 음성 기록을 지원하지 않아요. Chrome에서 열어 주세요.",
@@ -80,6 +84,10 @@ export const UI = {
       nextMonth: "Next month",
       weekdays: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
       empty: "No entries yet.",
+      calendar: "Calendar",
+      mood: "Mood Breakdown",
+      entries: "entries",
+      ranges: { week: "This Week", month: "This Month", year: "This Year" },
     },
     speech: {
       unsupported: "Voice notes aren't supported in this browser. Please open Chrome.",

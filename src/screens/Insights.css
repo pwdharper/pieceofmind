@@ -246,7 +246,8 @@
   border-radius: 50%;
 }
 
-.legend-empty {
+.mood-legend .legend-empty {
   justify-content: center;
+  text-align: center;
   color: var(--muted);
 }

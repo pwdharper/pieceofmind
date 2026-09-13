@@ -9,15 +9,15 @@
 
 ## 지금 되는 것
 
-- 홈: 날짜, 감정 2×4(라벨 없음), 일기(200자), 사진, 음성(Web Speech `ko-KR` → 입력란), 저장. 아직 없는 날을 처음 쓸 때만 랜덤 안내 한 줄. 안내 아이콘은 설정에서 고른 케이크
+- 홈: 날짜, 감정 2×4(라벨 없음), 일기(200자), 사진, 음성(Web Speech, 언어 설정에 따라 `ko-KR`/`en-US` → 입력란), 저장. 아직 없는 날을 처음 쓸 때만 랜덤 안내 한 줄(한/영 풀). 안내 아이콘은 설정에서 고른 케이크
 - 기록 상세: 그날의 감정 얼굴, 글, 사진, 로컬 폴백 AI. 라벨은 `'{이름}' {n}% 포착` (앞에 `AI 분석 :` 없음). 아이콘은 고른 케이크. 홈에서 보면 수정만, 통계에서 보면 뒤로/수정/닫기
 - 기록 수정: 같은 날 감정·글·사진을 고침. 저장하면 기록 상세로 가고, AI는 그때의 감정·글로 다시 붙임
-- 통계: 달력(기록 있는 날에 감정 얼굴), Mood Breakdown, 화면 이미지 저장. 없는 날을 누르면 그 날짜 작성 화면(홈과 같은 안내 한 줄)
-- 설정: 이메일 로그인(이 기기 세션만), 구글/카카오는 “곧 연결할게요.”, 테마(생크림/치즈), 언어(설정에서 고르면 홈·통계·설정도 한/영)
+- 통계: 달력(기록 있는 날에 감정 얼굴), 감정 분석(원형 그래프, 기간 이번주/이번달/올해). 한/영은 설정 언어(달력·감정 분석·기록·빈 상태 문구). 화면 이미지 저장. 없는 날을 누르면 그 날짜 작성 화면(홈과 같은 안내 한 줄)
+- 설정: 이메일 로그인(이 기기 세션만), 구글/카카오는 “곧 연결할게요.”, 테마(생크림/치즈), 언어(설정에서 고르면 홈·통계·설정도 한/영). 이메일·비밀번호는 한 줄 입력, 비밀번호는 기본 마스킹이고 눈 아이콘으로 보기/숨기기
 
 감정: 행복, 평온, 설렘, 불안, 슬픔, 화남, 피곤, 무기력
 
-테마: 생크림케이크, 치즈케이크. 없는 테마 값이 있으면 생크림으로 돌아감
+테마: 생크림, 치즈. 없는 테마 값이 있으면 생크림으로 돌아감
 
 ## 페이지 이동
 
@@ -48,7 +48,7 @@
 | 구분 | 선택 | 이유 |
 | --- | --- | --- |
 | 프론트 | Vite + React + TypeScript + React Router | 모바일 웹 SPA. 나중에 같은 `dist`를 앱으로 감쌈 |
-| 스타일 | CSS 변수 + PhoneShell(402px) | 케이크 테마 전환, 데스크톱에서도 동일 화면 |
+| 스타일 | CSS 변수 + PhoneShell(402px) | 케이크 테마 전환, 데스크톱에서도 동일 화면. 스크롤은 바깥 프레임, 바 유무로 캔버스 폭이 안 변함 |
 | 호스팅 | Vercel (수동) | Git 자동 배포 없음. 배포 요청이 있을 때만 `npx vercel` |
 | 계정/기록 | Supabase Auth + Postgres + Storage | 로컬 개발 가능, 이후 다른 백엔드로 갈아타기 쉬움 |
 | 비로그인 기록 | localStorage | 가입 없이 바로 사용 |
@@ -154,7 +154,9 @@ ANTHROPIC_API_KEY=
 | 케이크 그림 | `src/assets/cakes` 파일만 교체 |
 | 홈 안내·상세 AI의 케이크 아이콘 | `src/components/ThemeCakeIcon.tsx` |
 | 설정 화면 한/영 문구 | `src/screens/Settings.tsx`의 `COPY` |
-| 홈·통계 한/영 문구 | `src/content/uiCopy.ts` |
+| 홈·통계 한/영 문구(달력, 감정 분석, 기간, 기록) | `src/content/uiCopy.ts` |
+| 케이크 카드 이름 | `src/theme/cakes.ts`의 `labelKo` / `labelEn` |
+| 비밀번호 눈 아이콘 | `src/assets/icons` |
 | 홈 AI 팁 문구 풀 | `src/content/homeTips.ts` |
 | 기록 상세 AI 폴백 | `src/content/detailAi.ts` |
 | 저장 시 AI를 다시 붙이는 곳 | `src/platform/localEntries.ts`의 `upsertEntry` |
@@ -167,11 +169,13 @@ ANTHROPIC_API_KEY=
 - `src/theme` — 색/간격/라운드/글자 + 케이크 2종
 - `src/domain` — Emotion, Entry, ThemeId, Locale
 - `src/platform` — Auth/Entry/File/AI 포트. 지금은 게스트=localStorage, 이후 로그인=supabase
-- `src/content` — 홈 팁, 상세 AI 폴백
+- `src/content` — 홈 팁, 한/영 UI 문구, 상세 AI 폴백
+- `src/hooks` — `useLocale`, 작성 폼
 - `src/lib` — 날짜, 통계, `navFrom`
 - `api` — `/api/ai-copy` (Claude, 서버 전용)
 - `src/assets/emotions` — 감정 8종 SVG
 - `src/assets/cakes` — 생크림, 치즈 (Figma 설정 화면과 같은 그림)
+- `src/assets/icons` — 비밀번호 보기/숨기기 눈
 
 ## 디자인
 

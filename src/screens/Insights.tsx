@@ -6,7 +6,7 @@ import { EMOTION_LABELS, UI } from "../content/uiCopy";
 import type { Entry } from "../domain/types";
 import { useLocale } from "../hooks/useLocale";
 import { formatMonthLabel } from "../lib/formatDate";
-import { filterByRange, moodBreakdown, RANGE_LABELS, RANGE_ORDER, type ChartRange } from "../lib/insightStats";
+import { filterByRange, moodBreakdown, RANGE_ORDER, type ChartRange } from "../lib/insightStats";
 import { saveNodePng } from "../lib/saveNodePng";
 import { listEntries, todayKey } from "../platform/localEntries";
 import "./Insights.css";
@@ -81,7 +81,7 @@ export function Insights() {
         {saveNote ? <p className="insights-save-note">{saveNote}</p> : null}
 
         <section className="insights-block">
-          <p className="calendar-kicker">Calendar</p>
+          <p className="calendar-kicker">{t.calendar}</p>
           <div className="calendar-card">
             <div className="month-row">
               <button type="button" className="month-shift" onClick={() => shiftMonth(-1)} aria-label={t.prevMonth}>
@@ -121,11 +121,11 @@ export function Insights() {
 
         <section className="insights-block">
           <div className="chart-heading">
-            <p className="calendar-kicker">Mood Breakdown</p>
-            <RangeSelect value={moodRange} onChange={setMoodRange} />
+            <p className="calendar-kicker">{t.mood}</p>
+            <RangeSelect value={moodRange} onChange={setMoodRange} labels={t.ranges} />
           </div>
           <div className="mood-card">
-            <MoodDonut entries={moodEntries} rows={moods} empty={t.empty} locale={locale} />
+            <MoodDonut entries={moodEntries} rows={moods} empty={t.empty} unit={t.entries} locale={locale} />
           </div>
         </section>
       </main>
@@ -133,13 +133,21 @@ export function Insights() {
   );
 }
 
-function RangeSelect({ value, onChange }: { value: ChartRange; onChange: (next: ChartRange) => void }) {
+function RangeSelect({
+  value,
+  onChange,
+  labels,
+}: {
+  value: ChartRange;
+  onChange: (next: ChartRange) => void;
+  labels: Record<ChartRange, string>;
+}) {
   return (
     <label className="range-select">
       <select value={value} onChange={(event) => onChange(event.target.value as ChartRange)}>
         {RANGE_ORDER.map((range) => (
           <option key={range} value={range}>
-            {RANGE_LABELS[range]}
+            {labels[range]}
           </option>
         ))}
       </select>
@@ -152,11 +160,13 @@ function MoodDonut({
   entries,
   rows,
   empty,
+  unit,
   locale,
 }: {
   entries: Entry[];
   rows: ReturnType<typeof moodBreakdown>;
   empty: string;
+  unit: string;
   locale: keyof typeof EMOTION_LABELS;
 }) {
   const size = 170;
@@ -191,7 +201,7 @@ function MoodDonut({
         </svg>
         <div className="donut-center">
           <p className="donut-count">{entries.length}</p>
-          <p className="donut-sub">entries</p>
+          <p className="donut-sub">{unit}</p>
         </div>
       </div>
       <ul className="mood-legend">

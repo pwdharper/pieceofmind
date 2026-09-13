@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { cakeImages } from "../assets/cakes";
+import { eyeIcons } from "../assets/icons";
 import { AppHeader } from "../components/AppHeader";
 import type { Locale } from "../domain/types";
 import {
@@ -20,8 +21,10 @@ const COPY = {
     title: "설정",
     brand: "Piece of Mind",
     subtitle: "로그인하여 오늘의 조각들을 안전하게 보관하세요.",
-    email: "이메일 주소",
+    email: "이메일",
     password: "비밀번호",
+    showPassword: "비밀번호 보기",
+    hidePassword: "비밀번호 숨기기",
     login: "로그인",
     forgot: "비밀번호를 잊어 버리셨나요?",
     reset: "비밀번호 재설정",
@@ -46,6 +49,8 @@ const COPY = {
     subtitle: "Sign in to keep today’s pieces safe.",
     email: "Email",
     password: "Password",
+    showPassword: "Show password",
+    hidePassword: "Hide password",
     login: "Log in",
     forgot: "Forgot your password?",
     reset: "Reset password",
@@ -74,6 +79,7 @@ export function Settings() {
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const t = COPY[locale];
 
@@ -86,6 +92,7 @@ export function Settings() {
     setSessionState({ email: email.trim() });
     setNote(null);
     setPassword("");
+    setShowPassword(false);
   }
 
   function onLogout() {
@@ -134,27 +141,46 @@ export function Settings() {
               }}
             >
               <div className="settings-fields">
-                <label className="settings-field">
-                  <span>{t.email}</span>
-                  <input
-                    type="email"
-                    autoComplete="email"
-                    value={email}
-                    placeholder="hk.lee@example.com"
-                    onChange={(event) => setEmail(event.target.value)}
-                  />
-                </label>
-                {mode !== "reset" ? (
-                  <label className="settings-field">
-                    <span>{t.password}</span>
+                <div className="settings-field">
+                  <label className="settings-field-main">
+                    <span>{t.email}</span>
                     <input
-                      type="password"
-                      autoComplete={mode === "signup" ? "new-password" : "current-password"}
-                      value={password}
-                      placeholder="••••••••••••"
-                      onChange={(event) => setPassword(event.target.value)}
+                      type="email"
+                      autoComplete="email"
+                      value={email}
+                      placeholder="example@example.com"
+                      onChange={(event) => setEmail(event.target.value)}
                     />
                   </label>
+                </div>
+                {mode !== "reset" ? (
+                  <div className="settings-field">
+                    <label className="settings-field-main">
+                      <span>{t.password}</span>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                        value={password}
+                        placeholder="••••••••••••"
+                        onChange={(event) => setPassword(event.target.value)}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className="settings-eye"
+                      aria-label={showPassword ? t.hidePassword : t.showPassword}
+                      aria-pressed={showPassword}
+                      onClick={() => setShowPassword((open) => !open)}
+                    >
+                      <span
+                        className="settings-eye-icon"
+                        style={{
+                          ["--eye" as string]: `url(${showPassword ? eyeIcons.visible : eyeIcons.hidden})`,
+                        }}
+                        aria-hidden
+                      />
+                    </button>
+                  </div>
                 ) : null}
               </div>
               <div className="settings-actions">

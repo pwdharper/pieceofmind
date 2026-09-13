@@ -17,7 +17,7 @@ export type CakeTheme = {
 export const CAKES: CakeTheme[] = [
   {
     id: "cream",
-    labelKo: "생크림케이크",
+    labelKo: "생크림",
     labelEn: "Cream",
     vars: {
       "--bg": "#fffdf9",
@@ -30,7 +30,7 @@ export const CAKES: CakeTheme[] = [
   },
   {
     id: "cheese",
-    labelKo: "치즈케이크",
+    labelKo: "치즈",
     labelEn: "Cheese",
     vars: {
       "--bg": "#fff8e1",

@@ -3,12 +3,6 @@ import { dateFromKey } from "./formatDate";
 
 export type ChartRange = "month" | "week" | "year";
 
-export const RANGE_LABELS: Record<ChartRange, string> = {
-  week: "This Week",
-  month: "This Month",
-  year: "This Year",
-};
-
 export const RANGE_ORDER: ChartRange[] = ["week", "month", "year"];
 
 function inMonth(entry: Entry, year: number, monthIndex: number) {
