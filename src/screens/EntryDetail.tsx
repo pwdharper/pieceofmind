@@ -2,7 +2,8 @@ import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom"
 import { AppHeader } from "../components/AppHeader";
 import { EmotionIcon } from "../components/EmotionIcon";
 import { ThemeCakeIcon } from "../components/ThemeCakeIcon";
-import { dateFromKey, formatKoreanDate } from "../lib/formatDate";
+import { useLocale } from "../hooks/useLocale";
+import { dateFromKey, formatDateLabel } from "../lib/formatDate";
 import { originPath, originState, readNavFrom } from "../lib/navFrom";
 import { getById } from "../platform/localEntries";
 import "./EntryDetail.css";
@@ -11,6 +12,7 @@ export function EntryDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const locale = useLocale();
   const entry = id ? getById(id) : undefined;
   const from = readNavFrom(location.state);
   const fromHome = from === "home";
@@ -29,7 +31,7 @@ export function EntryDetail() {
     <>
       <AppHeader onBack={fromHome ? undefined : close} />
       <main className="detail-main">
-        <p className="detail-date">{formatKoreanDate(dateFromKey(saved.date))}</p>
+        <p className="detail-date">{formatDateLabel(dateFromKey(saved.date), locale)}</p>
         <div className="detail-emotion">
           <EmotionIcon emotion={saved.emotion} colored size={72} />
         </div>

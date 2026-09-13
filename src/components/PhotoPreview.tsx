@@ -1,10 +1,13 @@
+import { UI } from "../content/uiCopy";
+import { useLocale } from "../hooks/useLocale";
 import "./chrome.css";
 
 export function PhotoPreview({ src, onRemove }: { src: string; onRemove: () => void }) {
+  const t = UI[useLocale()].home;
   return (
     <div className="photo-preview-wrap">
-      <img className="photo-preview" src={src} alt="붙인 사진" />
-      <button type="button" className="photo-remove" onClick={onRemove} aria-label="사진 삭제">
+      <img className="photo-preview" src={src} alt={t.photoAlt} />
+      <button type="button" className="photo-remove" onClick={onRemove} aria-label={t.photoRemove}>
         <CloseIcon />
       </button>
     </div>

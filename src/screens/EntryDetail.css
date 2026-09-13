@@ -1,7 +1,5 @@
 .detail-main {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   align-items: center;

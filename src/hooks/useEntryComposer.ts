@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import { UI } from "../content/uiCopy";
 import { MAX_TEXT, type Emotion } from "../domain/types";
+import { getPrefs } from "../platform/prefs";
 import { appendTranscript, createSpeechSession, isSpeechSupported } from "../platform/speech";
 
 export function useEntryComposer(initial?: {
@@ -32,7 +34,7 @@ export function useEntryComposer(initial?: {
   function handleVoice() {
     setSpeechError(null);
     if (!isSpeechSupported()) {
-      setSpeechError("이 브라우저에서는 음성 기록을 지원하지 않아요. Chrome에서 열어 주세요.");
+      setSpeechError(UI[getPrefs().locale].speech.unsupported);
       return;
     }
     if (listening) {
@@ -48,8 +50,8 @@ export function useEntryComposer(initial?: {
       onHold: () => {
         textBaseRef.current = textRef.current;
       },
-      onError: (message) => {
-        setSpeechError(message);
+      onError: (id) => {
+        setSpeechError(UI[getPrefs().locale].speech[id]);
         setListening(false);
       },
       onEnd: () => setListening(false),

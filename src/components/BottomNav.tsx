@@ -1,22 +1,24 @@
 import { matchPath, NavLink, useLocation } from "react-router-dom";
+import { UI } from "../content/uiCopy";
+import { useLocale } from "../hooks/useLocale";
 import { readNavFrom } from "../lib/navFrom";
 import "./chrome.css";
 
-const tabs = [
-  { to: "/", label: "홈", end: true, icon: HomeIcon, key: "home" },
-  { to: "/insights", label: "통계", end: false, icon: ChartIcon, key: "insights" },
-  { to: "/settings", label: "설정", end: false, icon: GearIcon, key: "settings" },
-] as const;
-
 export function BottomNav() {
   const location = useLocation();
+  const t = UI[useLocale()].nav;
   if (location.pathname.endsWith("/edit")) return null;
 
   const onDetail = Boolean(matchPath({ path: "/entries/:id", end: true }, location.pathname));
   const from = readNavFrom(location.state);
+  const tabs = [
+    { to: "/", label: t.home, end: true, icon: HomeIcon, key: "home" },
+    { to: "/insights", label: t.insights, end: false, icon: ChartIcon, key: "insights" },
+    { to: "/settings", label: t.settings, end: false, icon: GearIcon, key: "settings" },
+  ] as const;
 
   return (
-    <nav className="bottom-nav" aria-label="주요 메뉴">
+    <nav className="bottom-nav" aria-label={t.menu}>
       {tabs.map((tab) => (
         <NavLink
           key={tab.to}

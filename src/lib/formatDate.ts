@@ -1,7 +1,27 @@
-const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"] as const;
+import type { Locale } from "../domain/types";
+import { UI } from "../content/uiCopy";
 
-export function formatKoreanDate(date = new Date()): string {
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 ${WEEKDAYS[date.getDay()]}요일`;
+const MONTHS_EN = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const;
+
+export function formatDateLabel(date = new Date(), locale: Locale = "ko"): string {
+  const weekdays = UI[locale].insights.weekdays;
+  if (locale === "en") {
+    return `${weekdays[date.getDay()]}, ${MONTHS_EN[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+  }
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 ${weekdays[date.getDay()]}요일`;
 }
 
 export function dateFromKey(key: string): Date {
@@ -22,6 +42,7 @@ function todayKeyFromParts(key: string): string {
   return `${y}-${m}-${d}`;
 }
 
-export function formatMonthLabel(year: number, monthIndex: number): string {
+export function formatMonthLabel(year: number, monthIndex: number, locale: Locale = "ko"): string {
+  if (locale === "en") return `${MONTHS_EN[monthIndex]} ${year}`;
   return `${year}년 ${monthIndex + 1}월`;
 }

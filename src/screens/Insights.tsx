@@ -2,14 +2,14 @@ import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppHeader } from "../components/AppHeader";
 import { EmotionIcon } from "../components/EmotionIcon";
+import { EMOTION_LABELS, UI } from "../content/uiCopy";
 import type { Entry } from "../domain/types";
+import { useLocale } from "../hooks/useLocale";
 import { formatMonthLabel } from "../lib/formatDate";
-import { filterByRange, flowPoints, moodBreakdown, RANGE_LABELS, type ChartRange } from "../lib/insightStats";
+import { filterByRange, moodBreakdown, RANGE_LABELS, RANGE_ORDER, type ChartRange } from "../lib/insightStats";
 import { saveNodePng } from "../lib/saveNodePng";
 import { listEntries, todayKey } from "../platform/localEntries";
 import "./Insights.css";
-
-const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
 function monthCells(year: number, monthIndex: number) {
   const first = new Date(year, monthIndex, 1);
@@ -23,11 +23,12 @@ function monthCells(year: number, monthIndex: number) {
 
 export function Insights() {
   const navigate = useNavigate();
+  const locale = useLocale();
+  const t = UI[locale].insights;
   const exportRef = useRef<HTMLElement>(null);
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [monthIndex, setMonthIndex] = useState(now.getMonth());
-  const [flowRange, setFlowRange] = useState<ChartRange>("month");
   const [moodRange, setMoodRange] = useState<ChartRange>("month");
   const [saving, setSaving] = useState(false);
   const [saveNote, setSaveNote] = useState<string | null>(null);
@@ -35,7 +36,6 @@ export function Insights() {
   const byDate = useMemo(() => new Map(entries.map((entry) => [entry.date, entry])), [entries]);
   const cells = monthCells(year, monthIndex);
   const today = todayKey();
-  const flow = flowPoints(entries, flowRange, year, monthIndex);
   const moodEntries = filterByRange(entries, moodRange, year, monthIndex);
   const moods = moodBreakdown(moodEntries);
 
@@ -62,7 +62,7 @@ export function Insights() {
     try {
       await saveNodePng(exportRef.current, `piece-of-mind-${year}-${String(monthIndex + 1).padStart(2, "0")}.png`);
     } catch {
-      setSaveNote("이미지를 저장하지 못했어요. 다시 시도해 주세요.");
+      setSaveNote(t.saveFail);
     } finally {
       setSaving(false);
     }
@@ -70,12 +70,12 @@ export function Insights() {
 
   return (
     <>
-      <AppHeader title="통계" size="page" />
+      <AppHeader title={t.title} size="page" />
       <main className="insights-main" ref={exportRef}>
         <div className="insights-download-row">
           <button type="button" className="insights-download" onClick={onSaveImage} disabled={saving}>
             <DownloadIcon />
-            {saving ? "저장 중…" : "이미지 저장"}
+            {saving ? t.saving : t.saveImage}
           </button>
         </div>
         {saveNote ? <p className="insights-save-note">{saveNote}</p> : null}
@@ -84,16 +84,16 @@ export function Insights() {
           <p className="calendar-kicker">Calendar</p>
           <div className="calendar-card">
             <div className="month-row">
-              <button type="button" className="month-shift" onClick={() => shiftMonth(-1)} aria-label="이전 달">
+              <button type="button" className="month-shift" onClick={() => shiftMonth(-1)} aria-label={t.prevMonth}>
                 ‹
               </button>
-              <p className="month-label">{formatMonthLabel(year, monthIndex)}</p>
-              <button type="button" className="month-shift" onClick={() => shiftMonth(1)} aria-label="다음 달">
+              <p className="month-label">{formatMonthLabel(year, monthIndex, locale)}</p>
+              <button type="button" className="month-shift" onClick={() => shiftMonth(1)} aria-label={t.nextMonth}>
                 ›
               </button>
             </div>
             <div className="weekday-row">
-              {WEEKDAYS.map((day) => (
+              {t.weekdays.map((day) => (
                 <span key={day}>{day}</span>
               ))}
             </div>
@@ -121,21 +121,11 @@ export function Insights() {
 
         <section className="insights-block">
           <div className="chart-heading">
-            <p className="calendar-kicker">Flow</p>
-            <RangeSelect value={flowRange} onChange={setFlowRange} />
-          </div>
-          <div className="calendar-card">
-            <FlowChart points={flow} />
-          </div>
-        </section>
-
-        <section className="insights-block">
-          <div className="chart-heading">
             <p className="calendar-kicker">Mood Breakdown</p>
             <RangeSelect value={moodRange} onChange={setMoodRange} />
           </div>
           <div className="mood-card">
-            <MoodDonut entries={moodEntries} rows={moods} />
+            <MoodDonut entries={moodEntries} rows={moods} empty={t.empty} locale={locale} />
           </div>
         </section>
       </main>
@@ -147,7 +137,7 @@ function RangeSelect({ value, onChange }: { value: ChartRange; onChange: (next: 
   return (
     <label className="range-select">
       <select value={value} onChange={(event) => onChange(event.target.value as ChartRange)}>
-        {(Object.keys(RANGE_LABELS) as ChartRange[]).map((range) => (
+        {RANGE_ORDER.map((range) => (
           <option key={range} value={range}>
             {RANGE_LABELS[range]}
           </option>
@@ -158,48 +148,16 @@ function RangeSelect({ value, onChange }: { value: ChartRange; onChange: (next: 
   );
 }
 
-function FlowChart({ points }: { points: { label: string; value: number }[] }) {
-  const width = 336;
-  const height = 98;
-  const pad = 8;
-  const max = 5;
-  const step = points.length > 1 ? width / (points.length - 1) : width;
-  const coords = points.map((point, index) => {
-    const x = index * step;
-    const usable = height - pad * 2;
-    const y = pad + usable - (point.value / max) * usable;
-    return { ...point, x, y };
-  });
-  const line = coords.map((point) => `${point.x},${point.y}`).join(" ");
-  const area = `0,${height} ${line} ${width},${height}`;
-
-  return (
-    <div className="flow-chart">
-      <svg className="flow-svg" viewBox={`0 0 ${width} ${height}`} width="100%" height="120" aria-hidden>
-        <line x1="0" y1="10" x2={width} y2="10" className="flow-grid" />
-        <line x1="0" y1="45" x2={width} y2="45" className="flow-grid" />
-        <line x1="0" y1="80" x2={width} y2="80" className="flow-grid" />
-        <polygon points={area} className="flow-area" />
-        <polyline points={line} className="flow-line" />
-        {coords.map((point) => (
-          <circle key={point.label} cx={point.x} cy={point.y} r="4" className="flow-dot" />
-        ))}
-      </svg>
-      <div className="flow-labels">
-        {points.map((point) => (
-          <span key={point.label}>{point.label}</span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function MoodDonut({
   entries,
   rows,
+  empty,
+  locale,
 }: {
   entries: Entry[];
   rows: ReturnType<typeof moodBreakdown>;
+  empty: string;
+  locale: keyof typeof EMOTION_LABELS;
 }) {
   const size = 170;
   const radius = 62;
@@ -242,13 +200,13 @@ function MoodDonut({
             <li key={row.emotion}>
               <span>
                 <i className="legend-dot" style={{ background: `var(--emotion-${row.emotion})` }} />
-                {row.emotion}
+                {EMOTION_LABELS[locale][row.emotion]}
               </span>
               <b>{row.percent}%</b>
             </li>
           ))
         ) : (
-          <li className="legend-empty">아직 기록이 없어요.</li>
+          <li className="legend-empty">{empty}</li>
         )}
       </ul>
     </>

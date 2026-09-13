@@ -3,7 +3,9 @@ import { AppButton } from "../components/AppButton";
 import { AppHeader } from "../components/AppHeader";
 import { EntryForm } from "../components/EntryForm";
 import { useEntryComposer } from "../hooks/useEntryComposer";
-import { dateFromKey, formatKoreanDate } from "../lib/formatDate";
+import { UI } from "../content/uiCopy";
+import { useLocale } from "../hooks/useLocale";
+import { dateFromKey, formatDateLabel } from "../lib/formatDate";
 import { originPath, originState, readNavFrom } from "../lib/navFrom";
 import { getById, upsertEntry } from "../platform/localEntries";
 
@@ -38,6 +40,7 @@ function EditForm({
   onBack: () => void;
 }) {
   const navigate = useNavigate();
+  const locale = useLocale();
   const composer = useEntryComposer(entry);
 
   function handleSave() {
@@ -54,14 +57,14 @@ function EditForm({
 
   return (
     <>
-      <AppHeader title="기록 수정" onBack={onBack} />
+      <AppHeader title={UI[locale].edit.title} onBack={onBack} />
       <EntryForm
-        dateLabel={formatKoreanDate(dateFromKey(entry.date))}
+        dateLabel={formatDateLabel(dateFromKey(entry.date), locale)}
         composer={composer}
         footer={
           <div className="home-save-block">
             <AppButton disabled={!composer.canSave} onClick={handleSave}>
-              저장
+              {UI[locale].home.save}
             </AppButton>
           </div>
         }

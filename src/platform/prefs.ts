@@ -51,9 +51,17 @@ export function setThemeId(themeId: ThemeId) {
   applyCake(themeId);
 }
 
+const LOCALE_EVENT = "pom:locale";
+
 export function setLocale(locale: Locale) {
   writePrefs({ ...readPrefs(), locale });
   document.documentElement.lang = locale;
+  window.dispatchEvent(new Event(LOCALE_EVENT));
+}
+
+export function subscribeLocale(listener: () => void) {
+  window.addEventListener(LOCALE_EVENT, listener);
+  return () => window.removeEventListener(LOCALE_EVENT, listener);
 }
 
 export function getSession(): Session | null {

@@ -1,4 +1,6 @@
+import { EMOTION_LABELS, UI } from "../content/uiCopy";
 import { EMOTIONS, type Emotion } from "../domain/types";
+import { useLocale } from "../hooks/useLocale";
 import { EmotionIcon } from "./EmotionIcon";
 import "./chrome.css";
 
@@ -9,8 +11,9 @@ export function EmotionGrid({
   value: Emotion | null;
   onChange: (emotion: Emotion) => void;
 }) {
+  const locale = useLocale();
   return (
-    <div className="emotion-grid" role="radiogroup" aria-label="오늘 감정">
+    <div className="emotion-grid" role="radiogroup" aria-label={UI[locale].home.emotions}>
       {EMOTIONS.map((emotion) => {
         const selected = value === emotion;
         return (
@@ -19,7 +22,7 @@ export function EmotionGrid({
             type="button"
             role="radio"
             aria-checked={selected}
-            aria-label={emotion}
+            aria-label={EMOTION_LABELS[locale][emotion]}
             className={selected ? "emotion-btn is-selected" : "emotion-btn"}
             onClick={() => onChange(emotion)}
           >

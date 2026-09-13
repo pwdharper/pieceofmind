@@ -1,3 +1,5 @@
+import { UI } from "../content/uiCopy";
+import { useLocale } from "../hooks/useLocale";
 import "./chrome.css";
 
 export function MediaRow({
@@ -11,6 +13,7 @@ export function MediaRow({
   onPhoto: (file: File) => void;
   onVoice: () => void;
 }) {
+  const t = UI[useLocale()].home;
   return (
     <div className="media-block">
       <div className="media-row">
@@ -26,11 +29,11 @@ export function MediaRow({
             }}
           />
           <CameraIcon />
-          사진 추가
+          {t.photo}
         </label>
         <button type="button" className="chip-btn" onClick={onVoice} aria-pressed={listening}>
           <MicIcon />
-          {listening ? "듣는 중…" : "음성 기록"}
+          {listening ? t.listening : t.voice}
         </button>
       </div>
       {speechError ? <p className="media-error">{speechError}</p> : null}

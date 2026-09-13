@@ -1,10 +1,10 @@
 import "./chrome.css";
 
-export function Greeting({ dateLabel }: { dateLabel: string }) {
+export function Greeting({ dateLabel, title }: { dateLabel: string; title: string }) {
   return (
     <section className="greeting">
       <p className="greeting-date">{dateLabel}</p>
-      <h2 className="greeting-title">오늘 기분은 어때요?</h2>
+      <h2 className="greeting-title">{title}</h2>
     </section>
   );
 }

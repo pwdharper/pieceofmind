@@ -1,7 +1,10 @@
+import { getPrefs } from "./prefs";
+import type { SpeechErrorId } from "../content/uiCopy";
+
 type SpeechHandlers = {
   onTranscript: (spoken: string) => void;
   onHold?: () => void;
-  onError: (message: string) => void;
+  onError: (id: SpeechErrorId) => void;
   onEnd: () => void;
 };
 
@@ -55,7 +58,7 @@ export function createSpeechSession(handlers: SpeechHandlers) {
   if (!Ctor) {
     return {
       start() {
-        handlers.onError("이 브라우저에서는 음성 기록을 지원하지 않아요. Chrome에서 열어 주세요.");
+        handlers.onError("unsupported");
         handlers.onEnd();
       },
       stop() {},
@@ -63,7 +66,7 @@ export function createSpeechSession(handlers: SpeechHandlers) {
   }
 
   const recognition = new Ctor();
-  recognition.lang = "ko-KR";
+  recognition.lang = getPrefs().locale === "en" ? "en-US" : "ko-KR";
   recognition.interimResults = true;
   recognition.continuous = true;
   recognition.maxAlternatives = 1;
@@ -79,14 +82,14 @@ export function createSpeechSession(handlers: SpeechHandlers) {
     if (event.error === "aborted" || event.error === "no-speech") return;
     active = false;
     if (event.error === "not-allowed") {
-      handlers.onError("마이크 권한이 필요해요. 주소창에서 마이크를 허용해 주세요.");
+      handlers.onError("notAllowed");
       return;
     }
     if (event.error === "network") {
-      handlers.onError("음성 인식에 네트워크가 필요해요. 연결을 확인해 주세요.");
+      handlers.onError("network");
       return;
     }
-    handlers.onError("음성을 글자로 바꾸지 못했어요.");
+    handlers.onError("failed");
   };
 
   recognition.onend = () => {
@@ -112,9 +115,9 @@ export function createSpeechSession(handlers: SpeechHandlers) {
         active = false;
         const name = error instanceof DOMException ? error.name : "";
         if (name === "NotAllowedError" || name === "NotFoundError") {
-          handlers.onError("마이크 권한이 필요해요. 주소창에서 마이크를 허용해 주세요.");
+          handlers.onError("notAllowed");
         } else {
-          handlers.onError("음성을 글자로 바꾸지 못했어요.");
+          handlers.onError("failed");
         }
         handlers.onEnd();
       }

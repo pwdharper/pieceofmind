@@ -4,9 +4,11 @@ import { AiTip } from "../components/AiTip";
 import { AppButton } from "../components/AppButton";
 import { AppHeader } from "../components/AppHeader";
 import { EntryForm } from "../components/EntryForm";
+import { UI } from "../content/uiCopy";
 import { pickHomeTip } from "../content/homeTips";
 import { useEntryComposer } from "../hooks/useEntryComposer";
-import { dateFromKey, formatKoreanDate, isDateKey } from "../lib/formatDate";
+import { useLocale } from "../hooks/useLocale";
+import { dateFromKey, formatDateLabel, isDateKey } from "../lib/formatDate";
 import { readNavFrom } from "../lib/navFrom";
 import { getByDate, todayKey, upsertEntry } from "../platform/localEntries";
 
@@ -26,8 +28,9 @@ export function Home() {
 function HomeComposer({ date }: { date: string }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const locale = useLocale();
   const composer = useEntryComposer();
-  const tip = useMemo(() => pickHomeTip(), []);
+  const tip = useMemo(() => pickHomeTip(locale), [locale]);
 
   function handleSave() {
     if (!composer.emotion || !composer.text.trim()) return;
@@ -44,12 +47,12 @@ function HomeComposer({ date }: { date: string }) {
     <>
       <AppHeader />
       <EntryForm
-        dateLabel={formatKoreanDate(dateFromKey(date))}
+        dateLabel={formatDateLabel(dateFromKey(date), locale)}
         composer={composer}
         footer={
           <div className="home-save-block">
             <AppButton disabled={!composer.canSave} onClick={handleSave}>
-              저장
+              {UI[locale].home.save}
             </AppButton>
             <AiTip text={tip} />
           </div>

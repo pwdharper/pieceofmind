@@ -1,7 +1,5 @@
 .insights-main {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -69,6 +67,12 @@
   color: var(--text);
   font-size: var(--font-tiny);
   font-weight: 600;
+}
+
+.range-select select:focus,
+.range-select select:focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
 .range-select svg {
@@ -161,45 +165,6 @@
 .day-icon-slot {
   width: 16px;
   height: 16px;
-}
-
-.flow-chart {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.flow-svg {
-  display: block;
-}
-
-.flow-grid {
-  stroke: var(--card-border);
-  stroke-width: 1;
-  opacity: 0.5;
-}
-
-.flow-area {
-  fill: var(--chip);
-}
-
-.flow-line {
-  fill: none;
-  stroke: var(--text);
-  stroke-width: 1.5;
-}
-
-.flow-dot {
-  fill: var(--bg);
-  stroke: var(--text);
-  stroke-width: 1.5;
-}
-
-.flow-labels {
-  display: flex;
-  justify-content: space-between;
-  color: var(--muted);
-  font-size: var(--font-tiny);
 }
 
 .donut-wrap {

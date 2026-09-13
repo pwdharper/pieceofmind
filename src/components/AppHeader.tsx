@@ -1,3 +1,5 @@
+import { UI } from "../content/uiCopy";
+import { useLocale } from "../hooks/useLocale";
 import "./chrome.css";
 
 export function AppHeader({
@@ -9,6 +11,7 @@ export function AppHeader({
   onBack?: () => void;
   size?: "brand" | "page";
 }) {
+  const backLabel = UI[useLocale()].edit.back;
   if (!onBack) {
     return (
       <header className="app-header">
@@ -19,7 +22,7 @@ export function AppHeader({
 
   return (
     <header className="app-header is-edit">
-      <button type="button" className="header-back" onClick={onBack} aria-label="뒤로">
+      <button type="button" className="header-back" onClick={onBack} aria-label={backLabel}>
         <BackIcon />
       </button>
       <h1 className="app-brand">{title}</h1>
