@@ -13,6 +13,9 @@ export function useEntryComposer(initial?: {
   const [listening, setListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const speechRef = useRef<ReturnType<typeof createSpeechSession> | null>(null);
+  const textRef = useRef(text);
+  const textBaseRef = useRef(initial?.text ?? "");
+  textRef.current = text;
 
   useEffect(() => {
     return () => speechRef.current?.stop();
@@ -29,7 +32,7 @@ export function useEntryComposer(initial?: {
   function handleVoice() {
     setSpeechError(null);
     if (!isSpeechSupported()) {
-      setSpeechError("이 브라우저에서는 음성 기록을 지원하지 않아요.");
+      setSpeechError("이 브라우저에서는 음성 기록을 지원하지 않아요. Chrome에서 열어 주세요.");
       return;
     }
     if (listening) {
@@ -37,9 +40,13 @@ export function useEntryComposer(initial?: {
       setListening(false);
       return;
     }
+    textBaseRef.current = textRef.current;
     speechRef.current = createSpeechSession({
       onTranscript: (spoken) => {
-        setText((current) => appendTranscript(current, spoken, MAX_TEXT));
+        setText(appendTranscript(textBaseRef.current, spoken, MAX_TEXT));
+      },
+      onHold: () => {
+        textBaseRef.current = textRef.current;
       },
       onError: (message) => {
         setSpeechError(message);

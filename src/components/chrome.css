@@ -148,6 +148,11 @@
   font-weight: 700;
 }
 
+.chip-btn[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--bg);
+}
+
 .save-btn {
   width: 197px;
   min-height: 48px;
