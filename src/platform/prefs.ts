@@ -11,6 +11,7 @@ type Prefs = {
 
 type Session = {
   email: string;
+  nickname?: string;
 };
 
 const DEFAULTS: Prefs = { themeId: "cream", locale: "ko" };
@@ -75,8 +76,9 @@ export function getSession(): Session | null {
   }
 }
 
-export function setSession(email: string) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify({ email }));
+export function setSession(email: string, nickname?: string) {
+  const name = nickname?.trim();
+  localStorage.setItem(SESSION_KEY, JSON.stringify(name ? { email, nickname: name } : { email }));
 }
 
 export function clearSession() {

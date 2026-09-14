@@ -5,11 +5,12 @@ import { EntryDetail } from "../screens/EntryDetail";
 import { Home } from "../screens/Home";
 import { Insights } from "../screens/Insights";
 import { Settings } from "../screens/Settings";
+import { Signup } from "../screens/Signup";
 import { PhoneShell } from "../shell/PhoneShell";
 
 export function App() {
   const { pathname } = useLocation();
-  const showNav = !pathname.endsWith("/edit");
+  const showNav = pathname !== "/signup" && !pathname.endsWith("/edit");
 
   return (
     <PhoneShell>
@@ -17,6 +18,7 @@ export function App() {
         <Route path="/" element={<Home />} />
         <Route path="/insights" element={<Insights />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/entries/:id" element={<EntryDetail />} />
         <Route path="/entries/:id/edit" element={<EditEntry />} />
         <Route path="*" element={<Navigate to="/" replace />} />

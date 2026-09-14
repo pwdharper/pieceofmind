@@ -7,7 +7,7 @@ import "./chrome.css";
 export function BottomNav() {
   const location = useLocation();
   const t = UI[useLocale()].nav;
-  if (location.pathname.endsWith("/edit")) return null;
+  if (location.pathname === "/signup" || location.pathname.endsWith("/edit")) return null;
 
   const onDetail = Boolean(matchPath({ path: "/entries/:id", end: true }, location.pathname));
   const from = readNavFrom(location.state);

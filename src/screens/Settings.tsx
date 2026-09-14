@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { cakeImages } from "../assets/cakes";
 import { eyeIcons } from "../assets/icons";
 import { AppHeader } from "../components/AppHeader";
@@ -14,7 +15,7 @@ import {
 import { CAKES } from "../theme/cakes";
 import "./Settings.css";
 
-type Mode = "login" | "signup" | "reset";
+type Mode = "login" | "reset";
 
 const COPY = {
   ko: {
@@ -72,6 +73,7 @@ const COPY = {
 } as const;
 
 export function Settings() {
+  const navigate = useNavigate();
   const prefs = getPrefs();
   const [locale, setLocaleState] = useState<Locale>(prefs.locale);
   const [themeId, setThemeState] = useState(prefs.themeId);
@@ -118,6 +120,7 @@ export function Settings() {
             <div className="settings-intro">
               <p className="settings-brand">{t.brand}</p>
               <p className="settings-sub">{t.welcome}</p>
+              {session.nickname ? <p className="settings-email-line">{session.nickname}</p> : null}
               <p className="settings-email-line">
                 {session.email} {t.signedIn}
               </p>
@@ -159,7 +162,7 @@ export function Settings() {
                       <span>{t.password}</span>
                       <input
                         type={showPassword ? "text" : "password"}
-                        autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                        autoComplete="current-password"
                         value={password}
                         placeholder="••••••••••••"
                         onChange={(event) => setPassword(event.target.value)}
@@ -185,7 +188,7 @@ export function Settings() {
               </div>
               <div className="settings-actions">
                 <button type="submit" className="settings-login-btn">
-                  {mode === "reset" ? t.reset : mode === "signup" ? t.signup : t.login}
+                  {mode === "reset" ? t.reset : t.login}
                 </button>
                 {note ? <p className="settings-note">{note}</p> : null}
                 <div className="settings-links">
@@ -196,9 +199,9 @@ export function Settings() {
                     </button>
                   </p>
                   <p>
-                    {mode === "signup" ? t.hasAccount : t.noAccount}{" "}
-                    <button type="button" onClick={() => setMode(mode === "signup" ? "login" : "signup")}>
-                      {mode === "signup" ? t.login : t.signup}
+                    {t.noAccount}{" "}
+                    <button type="button" onClick={() => navigate("/signup")}>
+                      {t.signup}
                     </button>
                   </p>
                 </div>

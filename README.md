@@ -13,7 +13,8 @@
 - 기록 상세: 그날의 감정 얼굴, 글, 사진, 로컬 폴백 AI. 라벨은 `'{이름}' {n}% 포착` (앞에 `AI 분석 :` 없음). 아이콘은 고른 케이크. 홈에서 보면 수정만, 통계에서 보면 뒤로/수정/닫기
 - 기록 수정: 같은 날 감정·글·사진을 고침. 저장하면 기록 상세로 가고, AI는 그때의 감정·글로 다시 붙임
 - 통계: 달력(기록 있는 날에 감정 얼굴), 감정 분석(원형 그래프, 기간 이번주/이번달/올해). 한/영은 설정 언어(달력·감정 분석·기록·빈 상태 문구). 화면 이미지 저장. 없는 날을 누르면 그 날짜 작성 화면(홈과 같은 안내 한 줄)
-- 설정: 이메일 로그인(이 기기 세션만), 구글/카카오는 “곧 연결할게요.”, 테마(생크림/치즈), 언어(설정에서 고르면 홈·통계·설정도 한/영). 이메일·비밀번호는 한 줄 입력, 비밀번호는 기본 마스킹이고 눈 아이콘으로 보기/숨기기
+- 설정: 이메일 로그인(이 기기 세션만), 구글/카카오는 “곧 연결할게요.”, 테마(생크림/치즈), 언어(설정에서 고르면 홈·통계·설정도 한/영). 이메일·비밀번호는 한 줄 입력, 비밀번호는 기본 마스킹이고 눈 아이콘으로 보기/숨기기. 로그인되면 닉네임(있을 때)과 이메일을 보여 줌
+- 회원가입(`/signup`): Figma 회원가입 화면. 인트로(함께 기분을 맞춰볼까요?)는 가운데 정렬. 이메일·비밀번호 필수, 닉네임 선택. 하단 탭·테마·언어 없음. 가입 후 설정으로 감. 이미 로그인돼 있으면 설정으로 보냄
 
 감정: 행복, 평온, 설렘, 불안, 슬픔, 화남, 피곤, 무기력
 
@@ -29,6 +30,7 @@
 | `/?date=YYYY-MM-DD` | 그 날짜 작성. 이미 있으면 그날 상세 | 있음 |
 | `/insights` | 통계 | 있음 |
 | `/settings` | 설정 | 있음 |
+| `/signup` | 이메일 회원가입 | 없음 |
 | `/entries/:id` | 기록 상세 | 있음 |
 | `/entries/:id/edit` | 기록 수정 | 없음 |
 
@@ -36,9 +38,10 @@
 - 홈에서 저장하면 기록 상세. 수정에서 저장해도 기록 상세(통계에서 고친 뒤에도 통계로 바로 돌아가지 않음)
 - 이미 저장된 날의 홈/하단 홈 탭도 기록 상세
 - 통계 달력에서 기록이 있는 날 → 기록 상세. 없는 날 → 그 날짜 작성 화면
-- 수정은 기록 상세의 수정으로만 들어갑니다. 하단 탭은 수정 화면에서만 숨깁니다
+- 수정은 기록 상세의 수정으로만 들어갑니다. 하단 탭은 수정 화면과 회원가입에서 숨깁니다
 - 기록 상세 홈에서 봄: 뒤로 없음, 닫기 없음, 수정만. 통계에서 봄: 뒤로·닫기·수정
-- 설정 로그인/회원가입은 이 기기 `pom.session`만 바꿈. 화면은 `/settings`에 남음. 게스트 기록 합치기는 아직 없음
+- 설정에서 회원가입 → `/signup`. 뒤로와 로그인은 설정. 가입 성공·이미 로그인된 `/signup`도 설정
+- 설정 로그인/회원가입은 이 기기 `pom.session`만 바꿈(이메일, 선택 닉네임). 게스트 기록 합치기는 아직 없음
 - 없는 주소나 없는 기록 id → `/`
 
 흐름은 `src/app/App.tsx`와 각 화면의 `navigate(...)`를 보면 됩니다. 들어온 곳은 `src/lib/navFrom.ts`의 `from: "home" | "insights"`입니다.
@@ -65,7 +68,7 @@
 
 - 기록: `pom.entries`
 - 테마/언어: `pom.prefs`
-- 설정 로그인 세션: `pom.session` (이메일만 기억. 서버 인증 아님)
+- 설정 로그인 세션: `pom.session` (이메일, 선택 닉네임. 서버 인증 아님)
 
 목표 저장소는 아래와 같습니다.
 
@@ -154,6 +157,7 @@ ANTHROPIC_API_KEY=
 | 케이크 그림 | `src/assets/cakes` 파일만 교체 |
 | 홈 안내·상세 AI의 케이크 아이콘 | `src/components/ThemeCakeIcon.tsx` |
 | 설정 화면 한/영 문구 | `src/screens/Settings.tsx`의 `COPY` |
+| 회원가입 화면 한/영 문구 | `src/screens/Signup.tsx`의 `COPY` |
 | 홈·통계 한/영 문구(달력, 감정 분석, 기간, 기록) | `src/content/uiCopy.ts` |
 | 케이크 카드 이름 | `src/theme/cakes.ts`의 `labelKo` / `labelEn` |
 | 비밀번호 눈 아이콘 | `src/assets/icons` |
@@ -164,7 +168,7 @@ ANTHROPIC_API_KEY=
 ## 폴더
 
 - `src/shell` — 402px PhoneShell
-- `src/screens` — Home, Insights, Settings, 기록 상세/수정
+- `src/screens` — Home, Insights, Settings, Signup, 기록 상세/수정
 - `src/components` — 하단 탭, 감정 그리드, 작성 폼, `ThemeCakeIcon`
 - `src/theme` — 색/간격/라운드/글자 + 케이크 2종
 - `src/domain` — Emotion, Entry, ThemeId, Locale
@@ -183,6 +187,7 @@ Figma는 구현의 출발점입니다. 설정 테마 카드는 [Setting (Logged 
 
 - 화면/IA: [ver.3](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-554)
 - 설정: [Setting (Logged Out)](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-561)
+- 회원가입: [Setting (Signup)](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=187-4) 인트로 두 줄은 가운데 정렬
 - 케이크 테마 색: [Cake Themes](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=19-63)
 - 홈 감정 그리드: [45:23](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-23)
 - 불안 얼굴: [45:38](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-38)
