@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
 import { AppButton } from "../components/AppButton";
 import { AppHeader } from "../components/AppHeader";
@@ -7,6 +8,8 @@ import { UI } from "../content/uiCopy";
 import { useLocale } from "../hooks/useLocale";
 import { dateFromKey, formatDateLabel } from "../lib/formatDate";
 import { originPath, originState, readNavFrom } from "../lib/navFrom";
+import { requestDetailAi } from "../platform/aiCopy";
+import { getSession } from "../platform/auth";
 import { getById, upsertEntry } from "../platform/localEntries";
 
 export function EditEntry() {
@@ -42,17 +45,30 @@ function EditForm({
   const navigate = useNavigate();
   const locale = useLocale();
   const composer = useEntryComposer(entry);
+  const [saving, setSaving] = useState(false);
 
-  function handleSave() {
-    if (!composer.emotion || !composer.text.trim()) return;
-    const saved = upsertEntry({
-      id: entry.id,
-      date: entry.date,
-      emotion: composer.emotion,
-      text: composer.text.trim(),
-      photoUrl: composer.photoUrl,
-    });
-    navigate(`/entries/${saved.id}`, { state: { from } });
+  async function handleSave() {
+    if (!composer.emotion || !composer.text.trim() || saving) return;
+    setSaving(true);
+    try {
+      const ai = await requestDetailAi(
+        locale,
+        composer.emotion,
+        composer.text.trim(),
+        getSession()?.nickname,
+      );
+      const saved = upsertEntry({
+        id: entry.id,
+        date: entry.date,
+        emotion: composer.emotion,
+        text: composer.text.trim(),
+        photoUrl: composer.photoUrl,
+        ...ai,
+      });
+      navigate(`/entries/${saved.id}`, { state: { from } });
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -63,8 +79,8 @@ function EditForm({
         composer={composer}
         footer={
           <div className="home-save-block">
-            <AppButton disabled={!composer.canSave} onClick={handleSave}>
-              {UI[locale].home.save}
+            <AppButton disabled={!composer.canSave || saving} onClick={() => void handleSave()}>
+              {saving ? UI[locale].home.saving : UI[locale].home.save}
             </AppButton>
           </div>
         }

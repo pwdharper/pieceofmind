@@ -9,7 +9,7 @@ type Prefs = {
   locale: Locale;
 };
 
-type Session = {
+export type Session = {
   email: string;
   nickname?: string;
 };

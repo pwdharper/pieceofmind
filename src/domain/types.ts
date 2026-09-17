@@ -1,12 +1,12 @@
 export const EMOTIONS = [
-  "행복",
-  "평온",
-  "설렘",
-  "불안",
-  "슬픔",
-  "화남",
-  "피곤",
-  "무기력",
+  "very-good",
+  "good",
+  "calm",
+  "neutral",
+  "worried",
+  "sad",
+  "angry",
+  "very-bad",
 ] as const;
 
 export type Emotion = (typeof EMOTIONS)[number];

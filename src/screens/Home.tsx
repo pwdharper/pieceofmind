@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { AiTip } from "../components/AiTip";
 import { AppButton } from "../components/AppButton";
@@ -10,6 +10,8 @@ import { useEntryComposer } from "../hooks/useEntryComposer";
 import { useLocale } from "../hooks/useLocale";
 import { dateFromKey, formatDateLabel, isDateKey } from "../lib/formatDate";
 import { readNavFrom } from "../lib/navFrom";
+import { requestDetailAi, requestHomeTip } from "../platform/aiCopy";
+import { getSession } from "../platform/auth";
 import { getByDate, todayKey, upsertEntry } from "../platform/localEntries";
 
 export function Home() {
@@ -30,17 +32,50 @@ function HomeComposer({ date }: { date: string }) {
   const location = useLocation();
   const locale = useLocale();
   const composer = useEntryComposer();
-  const tip = useMemo(() => pickHomeTip(locale), [locale]);
+  const [tip, setTip] = useState(() => pickHomeTip(locale));
+  const [saving, setSaving] = useState(false);
 
-  function handleSave() {
-    if (!composer.emotion || !composer.text.trim()) return;
-    const entry = upsertEntry({
-      date,
-      emotion: composer.emotion,
-      text: composer.text.trim(),
-      photoUrl: composer.photoUrl,
+  useEffect(() => {
+    let alive = true;
+    const cacheKey = `pom.homeTip.${date}.${locale}`;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      setTip(cached);
+      return () => {
+        alive = false;
+      };
+    }
+    void requestHomeTip(locale).then((text) => {
+      if (!alive) return;
+      setTip(text);
+      sessionStorage.setItem(cacheKey, text);
     });
-    navigate(`/entries/${entry.id}`, { state: { from: readNavFrom(location.state) } });
+    return () => {
+      alive = false;
+    };
+  }, [date, locale]);
+
+  async function handleSave() {
+    if (!composer.emotion || !composer.text.trim() || saving) return;
+    setSaving(true);
+    try {
+      const ai = await requestDetailAi(
+        locale,
+        composer.emotion,
+        composer.text.trim(),
+        getSession()?.nickname,
+      );
+      const entry = upsertEntry({
+        date,
+        emotion: composer.emotion,
+        text: composer.text.trim(),
+        photoUrl: composer.photoUrl,
+        ...ai,
+      });
+      navigate(`/entries/${entry.id}`, { state: { from: readNavFrom(location.state) } });
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -51,8 +86,8 @@ function HomeComposer({ date }: { date: string }) {
         composer={composer}
         footer={
           <div className="home-save-block">
-            <AppButton disabled={!composer.canSave} onClick={handleSave}>
-              {UI[locale].home.save}
+            <AppButton disabled={!composer.canSave || saving} onClick={() => void handleSave()}>
+              {saving ? UI[locale].home.saving : UI[locale].home.save}
             </AppButton>
             <AiTip text={tip} />
           </div>

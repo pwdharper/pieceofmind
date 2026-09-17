@@ -151,6 +151,10 @@
   font-size: var(--font-small);
 }
 
+.settings-note.is-danger {
+  color: var(--danger);
+}
+
 .settings-links {
   display: flex;
   flex-direction: column;

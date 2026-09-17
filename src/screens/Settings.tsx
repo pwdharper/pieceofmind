@@ -4,14 +4,8 @@ import { cakeImages } from "../assets/cakes";
 import { eyeIcons } from "../assets/icons";
 import { AppHeader } from "../components/AppHeader";
 import type { Locale } from "../domain/types";
-import {
-  clearSession,
-  getPrefs,
-  getSession,
-  setLocale,
-  setSession,
-  setThemeId,
-} from "../platform/prefs";
+import { AuthError, getSession, signIn, signOut } from "../platform/auth";
+import { getPrefs, setLocale, setThemeId } from "../platform/prefs";
 import { CAKES } from "../theme/cakes";
 import "./Settings.css";
 
@@ -38,6 +32,10 @@ const COPY = {
     language: "언어",
     later: "곧 연결할게요.",
     needFields: "이메일과 비밀번호를 입력해 주세요.",
+    invalidEmail: "이메일 형식을 확인해 주세요.",
+    shortPassword: "비밀번호는 6자 이상이어야 해요.",
+    missingAccount: "가입된 계정이 없어요. 먼저 회원가입을 해 주세요.",
+    badPassword: "비밀번호가 올바르지 않아요.",
     resetHint: "재설정 메일은 아직 보내지 않아요. 이메일을 확인해 주세요.",
     signedIn: "으로 로그인되어 있어요.",
     logout: "로그아웃",
@@ -64,6 +62,10 @@ const COPY = {
     language: "Language",
     later: "Coming soon.",
     needFields: "Please enter email and password.",
+    invalidEmail: "Check the email format.",
+    shortPassword: "Password must be at least 6 characters.",
+    missingAccount: "No account yet. Please sign up first.",
+    badPassword: "That password is incorrect.",
     resetHint: "Reset email is not sent yet. Check the address you entered.",
     signedIn: "is signed in.",
     logout: "Log out",
@@ -83,32 +85,52 @@ export function Settings() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const [noteDanger, setNoteDanger] = useState(false);
   const t = COPY[locale];
 
-  function onLogin() {
-    if (!email.trim() || !password.trim()) {
-      setNote(t.needFields);
-      return;
+  const AUTH_NOTES = {
+    need_fields: t.needFields,
+    invalid_email: t.invalidEmail,
+    short_password: t.shortPassword,
+    no_account: t.missingAccount,
+    bad_password: t.badPassword,
+    email_taken: t.missingAccount,
+  } as const;
+
+  function showNote(text: string, danger = false) {
+    setNote(text);
+    setNoteDanger(danger);
+  }
+
+  async function onLogin() {
+    try {
+      const next = await signIn(email, password);
+      setSessionState(next);
+      setNote(null);
+      setNoteDanger(false);
+      setPassword("");
+      setShowPassword(false);
+    } catch (error) {
+      if (error instanceof AuthError) {
+        showNote(AUTH_NOTES[error.code], true);
+        return;
+      }
+      throw error;
     }
-    setSession(email.trim());
-    setSessionState({ email: email.trim() });
-    setNote(null);
-    setPassword("");
-    setShowPassword(false);
   }
 
   function onLogout() {
-    clearSession();
+    signOut();
     setSessionState(null);
     setMode("login");
   }
 
   function onReset() {
     if (!email.trim()) {
-      setNote(t.needFields);
+      showNote(t.needFields, true);
       return;
     }
-    setNote(t.resetHint);
+    showNote(t.resetHint);
   }
 
   return (
@@ -140,7 +162,7 @@ export function Settings() {
               onSubmit={(event) => {
                 event.preventDefault();
                 if (mode === "reset") onReset();
-                else onLogin();
+                else void onLogin();
               }}
             >
               <div className="settings-fields">
@@ -190,7 +212,7 @@ export function Settings() {
                 <button type="submit" className="settings-login-btn">
                   {mode === "reset" ? t.reset : t.login}
                 </button>
-                {note ? <p className="settings-note">{note}</p> : null}
+                {note ? <p className={`settings-note${noteDanger ? " is-danger" : ""}`}>{note}</p> : null}
                 <div className="settings-links">
                   <p>
                     {mode === "reset" ? null : `${t.forgot} `}
@@ -207,11 +229,11 @@ export function Settings() {
                 </div>
                 <div className="settings-sns">
                   <p className="settings-sns-label">{t.sns}</p>
-                  <button type="button" className="sns-btn is-google" onClick={() => setNote(t.later)}>
+                  <button type="button" className="sns-btn is-google" onClick={() => showNote(t.later)}>
                     <GoogleIcon />
                     {t.google}
                   </button>
-                  <button type="button" className="sns-btn is-kakao" onClick={() => setNote(t.later)}>
+                  <button type="button" className="sns-btn is-kakao" onClick={() => showNote(t.later)}>
                     <KakaoIcon />
                     {t.kakao}
                   </button>

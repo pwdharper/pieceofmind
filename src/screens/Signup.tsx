@@ -3,7 +3,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { eyeIcons } from "../assets/icons";
 import { AppHeader } from "../components/AppHeader";
 import { useLocale } from "../hooks/useLocale";
-import { getSession, setSession } from "../platform/prefs";
+import { AuthError, getSession, signUp } from "../platform/auth";
 import "../screens/Settings.css";
 import "./Signup.css";
 
@@ -22,6 +22,9 @@ const COPY = {
     hasAccount: "이미 계정이 있으신가요?",
     login: "로그인",
     needFields: "이메일과 비밀번호를 입력해 주세요.",
+    invalidEmail: "이메일 형식을 확인해 주세요.",
+    shortPassword: "비밀번호는 6자 이상이어야 해요.",
+    emailTaken: "이미 가입된 이메일이에요.",
   },
   en: {
     title: "Sign up",
@@ -37,6 +40,9 @@ const COPY = {
     hasAccount: "Already have an account?",
     login: "Log in",
     needFields: "Please enter email and password.",
+    invalidEmail: "Check the email format.",
+    shortPassword: "Password must be at least 6 characters.",
+    emailTaken: "That email is already registered.",
   },
 } as const;
 
@@ -54,13 +60,25 @@ export function Signup() {
     return <Navigate to="/settings" replace />;
   }
 
-  function onSubmit() {
-    if (!email.trim() || !password.trim()) {
-      setNote(t.needFields);
-      return;
+  async function onSubmit() {
+    try {
+      await signUp(email, password, nickname);
+      navigate("/settings", { replace: true });
+    } catch (error) {
+      if (error instanceof AuthError) {
+        const notes = {
+          need_fields: t.needFields,
+          invalid_email: t.invalidEmail,
+          short_password: t.shortPassword,
+          email_taken: t.emailTaken,
+          no_account: t.needFields,
+          bad_password: t.needFields,
+        } as const;
+        setNote(notes[error.code]);
+        return;
+      }
+      throw error;
     }
-    setSession(email.trim(), nickname);
-    navigate("/settings", { replace: true });
   }
 
   return (
@@ -75,7 +93,7 @@ export function Signup() {
           className="signup-form"
           onSubmit={(event) => {
             event.preventDefault();
-            onSubmit();
+            void onSubmit();
           }}
         >
           <div className="settings-fields">
@@ -135,7 +153,7 @@ export function Signup() {
             <button type="submit" className="settings-login-btn">
               {t.submit}
             </button>
-            {note ? <p className="settings-note">{note}</p> : null}
+            {note ? <p className="settings-note is-danger">{note}</p> : null}
             <p className="signup-login-row">
               {t.hasAccount}{" "}
               <button type="button" onClick={() => navigate("/settings")}>

@@ -2,6 +2,7 @@ import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom"
 import { AppHeader } from "../components/AppHeader";
 import { EmotionIcon } from "../components/EmotionIcon";
 import { ThemeCakeIcon } from "../components/ThemeCakeIcon";
+import { EMOTION_LABELS } from "../content/uiCopy";
 import { useLocale } from "../hooks/useLocale";
 import { dateFromKey, formatDateLabel } from "../lib/formatDate";
 import { originPath, originState, readNavFrom } from "../lib/navFrom";
@@ -46,7 +47,7 @@ export function EntryDetail() {
               <ThemeCakeIcon size={32} />
             </span>
             <p className="detail-ai-label">
-              '{saved.aiLabel ?? saved.emotion}' {saved.aiPercent ?? 80}% 포착
+              '{saved.aiLabel ?? EMOTION_LABELS[locale][saved.emotion]}' {saved.aiPercent ?? 80}% 포착
             </p>
           </div>
           <p className="detail-ai-bubble">
