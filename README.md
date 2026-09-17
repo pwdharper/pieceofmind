@@ -119,7 +119,7 @@ cp .env.example .env
 npm run dev
 ```
 
-`.env`에 `ANTHROPIC_API_KEY`를 넣은 뒤에는 개발 서버를 다시 켭니다. 브라우저는 `http://localhost:5173` 또는 `http://127.0.0.1:5173`. 로컬 `/api/ai-copy`는 Vite가 `api/generateCopy.ts`로 연결합니다.
+`.env`에 `ANTHROPIC_API_KEY`를 넣은 뒤에는 개발 서버를 다시 켭니다. 브라우저는 `http://localhost:5173` 또는 `http://127.0.0.1:5173`. 로컬 `/api/ai-copy`는 Vite가 `server/generateCopy.ts`로 연결합니다.
 
 ## 환경 변수
 
@@ -165,7 +165,7 @@ Claude 키는 서버만 씁니다. 프론트(`VITE_`)와 커밋에 넣지 않습
 | 비밀번호 눈 아이콘 | `src/assets/icons` |
 | 홈 AI 팁 문구 풀(폴백) | `src/content/homeTips.ts` |
 | 기록 상세 AI 폴백 | `src/content/detailAi.ts` |
-| Claude 호출 | `api/generateCopy.ts`, 화면은 `src/platform/aiCopy.ts` |
+| Claude 호출 | `server/generateCopy.ts`, 화면은 `src/platform/aiCopy.ts` |
 | 저장 시 AI를 붙이는 곳 | `src/screens/Home.tsx`, `src/screens/EditEntry.tsx` |
 | 이메일 가입/로그인 | `src/platform/auth.ts` |
 
@@ -180,7 +180,8 @@ Claude 키는 서버만 씁니다. 프론트(`VITE_`)와 커밋에 넣지 않습
 - `src/content` — 홈 팁, 한/영 UI 문구, 상세 AI 폴백
 - `src/hooks` — `useLocale`, 작성 폼
 - `src/lib` — 날짜, 통계, `navFrom`
-- `api` — `/api/ai-copy` (Claude, 서버 전용. 로컬은 Vite가 같은 경로로 연결)
+- `api` — `/api/ai-copy` (Vercel 함수. 로컬은 Vite가 같은 경로로 연결)
+- `server` — Claude 문구 생성. `api` 폴더 밖에 두어 함수가 의존성을 묶게 함
 - `src/assets/emotions` — 감정 8종 SVG
 - `src/assets/cakes` — 생크림, 치즈 (Figma 설정 화면과 같은 그림)
 - `src/assets/icons` — 비밀번호 보기/숨기기 눈

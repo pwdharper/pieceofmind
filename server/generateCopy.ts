@@ -14,6 +14,11 @@ export type AiCopyResponse =
 
 const MODEL = anthropic("claude-haiku-4-5");
 
+function anthropicKey() {
+  return (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env
+    ?.ANTHROPIC_API_KEY;
+}
+
 function stripWrap(text: string) {
   return text.trim().replace(/^["'“”]+|["'“”]+$/g, "").trim();
 }
@@ -74,7 +79,7 @@ const ACTION_GUIDES: Record<Emotion, { ko: string; en: string }> = {
 };
 
 export async function generateCopy(input: AiCopyRequest): Promise<AiCopyResponse> {
-  if (!process.env.ANTHROPIC_API_KEY) throw new Error("missing_key");
+  if (!anthropicKey()) throw new Error("missing_key");
 
   if (input.kind === "home-tip") {
     const { text } = await generateText({

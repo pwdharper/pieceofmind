@@ -1,6 +1,6 @@
 import { defineConfig, loadEnv, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
-import { generateCopy, type AiCopyRequest } from "./api/generateCopy";
+import { generateCopy, type AiCopyRequest } from "./server/generateCopy";
 
 function aiCopyPlugin(): Plugin {
   return {

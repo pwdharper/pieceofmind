@@ -1,4 +1,4 @@
-import { generateCopy, type AiCopyRequest } from "./generateCopy";
+import { generateCopy, type AiCopyRequest } from "../server/generateCopy";
 
 type NodeRes = {
   status: (code: number) => NodeRes;
