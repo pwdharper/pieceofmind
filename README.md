@@ -1,7 +1,7 @@
 # Piece of Mind
 
 하루에 감정 한 조각을 남기는 모바일 웹 일기장입니다.
-지금은 이 브라우저의 localStorage에 저장됩니다. 회원가입하면 이 기기에 계정이 생기고, 그 이메일·비밀번호가 맞을 때만 로그인됩니다. 홈 안내와 기록 상세 분석은 Claude(`ANTHROPIC_API_KEY`)가 만들고, 키가 없으면 로컬 폴백을 씁니다. 서버 계정(Supabase)은 아래 목표 스택입니다.
+로그아웃이면 이 브라우저 localStorage에 두고, 이메일 가입/로그인은 Supabase 계정입니다. 같은 이메일로 다른 기기·시크릿 창에서도 들어갑니다. 홈 안내와 기록 상세 분석은 Claude(`ANTHROPIC_API_KEY`)가 만들고, 키가 없으면 로컬 폴백을 씁니다.
 
 모바일 브라우저와 데스크톱 브라우저에서 모두 동작합니다.
 화면은 Figma 모바일 프레임(402px)이 기준이며, 데스크톱에서는 가운데 폰 캔버스로 보입니다.
@@ -9,12 +9,12 @@
 
 ## 지금 되는 것
 
-- 홈: 날짜, 감정 2×4(화면 라벨 없음, 접근성 이름은 아래 8종), 일기(200자), 사진, 음성(Web Speech, 언어 설정에 따라 `ko-KR`/`en-US` → 입력란), 저장. 아직 없는 날을 처음 쓸 때만 하단 안내 한 줄(Claude, 실패 시 한/영 풀). 안내 아이콘은 설정에서 고른 케이크
+- 홈: 날짜, 감정 2×4(화면 라벨 없음, 접근성 이름은 아래 8종), 일기(200자), 사진, 음성(Web Speech, 언어 설정에 따라 `ko-KR`/`en-US` → 입력란, 버튼은 한국어 `말로 작성` / 영어 `Voice to Text`), 저장. 아직 없는 날을 처음 쓸 때만 하단 안내 한 줄(Claude, 실패 시 한/영 풀). 안내 아이콘은 설정에서 고른 케이크. 이메일·비밀번호·닉네임 입력은 16px이라 iOS가 확대하지 않음
 - 기록 상세: 그날의 감정 얼굴, 글, 사진, Claude 분석(실패 시 로컬 폴백). 라벨은 `'{이름}' {n}% 포착` (앞에 `AI 분석 :` 없음). 아이콘은 고른 케이크. 홈에서 보면 수정만, 통계에서 보면 뒤로/수정/닫기
 - 기록 수정: 같은 날 감정·글·사진을 고침. 저장하면 기록 상세로 가고, AI는 **그때 고른 감정 얼굴과 일기 글**을 기준으로 다시 붙임. 이미 저장된 분석은 다시 저장해야 바뀜
 - 통계: 달력(기록 있는 날에 감정 얼굴), 감정 분석(원형 그래프, 기간 이번주/이번달/올해). 한/영은 설정 언어(달력·감정 분석·기록·빈 상태 문구). 화면 이미지 저장. 없는 날을 누르면 그 날짜 작성 화면(홈과 같은 안내 한 줄)
-- 설정: 이메일 로그인(이 기기에 가입된 계정만, PBKDF2로 비밀번호 확인). 가입하지 않은 이메일은 거절하고 빨간 안내를 보여 줌. 구글/카카오는 “곧 연결할게요.”, 테마(생크림/치즈), 언어(설정에서 고르면 홈·통계·설정도 한/영). 이메일·비밀번호는 한 줄 입력, 비밀번호는 기본 마스킹이고 눈 아이콘으로 보기/숨기기. 로그인되면 닉네임(있을 때)과 이메일을 보여 줌
-- 회원가입(`/signup`): Figma 회원가입 화면. 인트로(함께 기분을 맞춰볼까요?)는 가운데 정렬. 이메일·비밀번호(6자 이상) 필수, 닉네임 선택. 이미 있는 이메일은 거절. 하단 탭·테마·언어 없음. 가입 후 설정으로 감. 이미 로그인돼 있으면 설정으로 보냄
+- 설정: 이메일 로그인(Supabase). 없는 계정·틀린 비밀번호는 빨간 안내. 구글/카카오는 “곧 연결할게요.”, 테마(생크림/치즈)·언어는 로그인 전후 같은 UI. 이메일·비밀번호는 한 줄 입력, 비밀번호는 기본 마스킹이고 눈 아이콘으로 보기/숨기기. 로그인되면 프로필(아바타·닉네임·일반 회원·이메일), 이메일은 잠금·수정 불가, 닉네임은 연필로 수정(비어 있으면 `마음조각`). 비밀번호 변경·회원 탈퇴는 “곧 연결할게요.” 활동은 연속 기록일·총 조각·이달 달성
+- 회원가입(`/signup`): Figma 회원가입 화면. 인트로(함께 기분을 맞춰볼까요?)는 가운데 정렬. 이메일·비밀번호(6자 이상) 필수, 닉네임 선택. 이미 있는 이메일은 거절. 하단 탭·테마·언어 없음. 가입 후 설정으로 감. 이미 로그인돼 있으면 설정으로 보냄. 예전 이 기기 `pom.accounts`는 쓰지 않음(다시 가입)
 
 감정: 아주 좋음, 좋음, 편안함, 보통, 걱정, 슬픔, 화남, 매우 나쁨 (`emotion_01_very-good.svg` … `emotion_08_very-bad.svg`)
 
@@ -41,7 +41,7 @@
 - 수정은 기록 상세의 수정으로만 들어갑니다. 하단 탭은 수정 화면과 회원가입에서 숨깁니다
 - 기록 상세 홈에서 봄: 뒤로 없음, 닫기 없음, 수정만. 통계에서 봄: 뒤로·닫기·수정
 - 설정에서 회원가입 → `/signup`. 뒤로와 로그인은 설정. 가입 성공·이미 로그인된 `/signup`도 설정
-- 로그인/회원가입은 이 기기 `pom.accounts`(이메일·비밀번호 해시)와 `pom.session`만 바꿈. 가입하지 않은 이메일로는 로그인되지 않음. 게스트 기록 합치기는 아직 없음
+- 로그인/회원가입은 Supabase Auth. 로그인 중 기록은 `entries`(본인 행만 RLS). 로그아웃 기록은 `pom.entries`. 로그인 순간 같은 날짜가 계정에 없으면 게스트 기록을 올리고 로컬 게스트를 비움
 - 없는 주소나 없는 기록 id → `/`
 
 흐름은 `src/app/App.tsx`와 각 화면의 `navigate(...)`를 보면 됩니다. 들어온 곳은 `src/lib/navFrom.ts`의 `from: "home" | "insights"`입니다.
@@ -53,7 +53,7 @@
 | 프론트 | Vite + React + TypeScript + React Router | 모바일 웹 SPA. 나중에 같은 `dist`를 앱으로 감쌈 |
 | 스타일 | CSS 변수 + PhoneShell(402px) | 케이크 테마 전환, 데스크톱에서도 동일 화면. 스크롤은 바깥 프레임, 바 유무로 캔버스 폭이 안 변함 |
 | 호스팅 | Vercel (수동 CLI) | Git 푸시로 자동 배포하지 않음. 요청이 있을 때만 `npx vercel --prod` |
-| 계정/기록 | 지금은 이 기기 localStorage. 목표는 Supabase Auth + Postgres + Storage | 화면은 포트만 써서 나중에 저장소를 갈아탈 수 있음 |
+| 계정/기록 | 로그인: Supabase Auth + Postgres `entries`(RLS). 로그아웃: localStorage | 화면은 포트만 써서 SDK를 직접 부르지 않음 |
 | 비로그인 기록 | localStorage | 가입 없이 바로 사용 |
 | 홈 하단 안내 | Claude (`ai` + `@ai-sdk/anthropic`, `claude-haiku-4-5`) | 그 날짜를 처음 쓸 때만. 실패하면 `homeTips.ts` 풀 |
 | 기록 상세 AI | 같은 Claude 경로 | 고른 감정 얼굴 + 일기 글. 실패하면 `detailAi.ts` 폴백. 키는 서버만 |
@@ -64,18 +64,12 @@
 
 ## 기록은 어디에 저장되나요?
 
-지금은 이 브라우저의 localStorage입니다.
-
-- 기록: `pom.entries`
+- 로그아웃 기록: `pom.entries`
 - 테마/언어: `pom.prefs`
-- 계정: `pom.accounts` (이메일, 비밀번호 해시, 선택 닉네임. 이 브라우저만)
-- 로그인 세션: `pom.session` (이메일, 선택 닉네임. 서버 인증 아님)
+- 로그인 계정: Supabase Auth (세션은 이 브라우저, 계정은 서버)
+- 로그인 기록: Supabase `entries` (본인만 RLS)
 
-목표 저장소는 아래와 같습니다.
-
-- 로그아웃: 이 브라우저의 localStorage
-- 로그인/회원가입: Supabase (`entries` 테이블, 본인 행만 RLS)
-- 로그인하는 순간: 기기에 있던 게스트 기록을 계정으로 합친 뒤 로컬 게스트 버킷을 비움
+로그인하는 순간, 기기에 있던 게스트 기록 중 계정에 없는 날짜를 올린 뒤 로컬 게스트를 비웁니다. 같은 날짜가 계정에 있으면 계정 기록을 유지합니다.
 
 1차는 이메일 가입/로그인입니다. 구글·카카오 버튼은 화면에 두고 제공자 연동은 이후입니다.
 
@@ -84,7 +78,7 @@
 홈 안내와 기록 상세 분석은 서버 `/api/ai-copy`에서 Claude를 부릅니다. [`generateText`](https://ai-sdk.dev/docs/introduction) (`ai` + `@ai-sdk/anthropic`, 모델 `claude-haiku-4-5`). 로컬은 Vite 미들웨어, 배포는 `api/ai-copy.ts`가 같은 경로를 받습니다. `ANTHROPIC_API_KEY`는 서버 환경 변수만 쓰고 프론트(`VITE_`)와 Git에는 넣지 않습니다. 키가 없거나 호출이 실패하면 Figma 톤의 로컬 폴백을 보여 칸이 비지 않게 합니다.
 
 1. **홈 하단 안내** ([45:68](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-68), Home `45:555` 안) — 그 날짜 기록이 아직 없을 때, 작성 화면에만. Claude가 짧은 응원 한 줄을 만듭니다. 실패하면 `src/content/homeTips.ts` 풀에서 랜덤 1개. 아이콘은 `ThemeCakeIcon`(설정 케이크). 저장하면 기록 상세로 가서 이 줄은 숨김.
-2. **기록 상세 분석** ([56:28](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=56-28)) — `'{보람찬 아주 좋음}' 82% 포착` + 공감 말풍선. 아이콘은 같은 케이크. 저장·수정 저장 때 **고른 감정 얼굴**과 **일기 글**(닉네임이 있으면 닉네임)을 Claude에 보냅니다. 라벨은 그 감정 이름(아주 좋음·슬픔 등)을 쓰고, 문구는 일기의 말·상황을 받은 뒤 공감 + 작은 행동 하나입니다. 모델이 감정을 바꿔 말해도 서버/클라이언트가 고른 감정 이름으로 맞춥니다. 실패하면 `src/content/detailAi.ts` 폴백(일기 한 줄을 앞에 붙임). 고친 데이터 기준 피드백이 상세에 보입니다.
+2. **기록 상세 분석** ([56:28](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=56-28)) — `'{보람찬 아주 좋음}' 82% 포착` + 공감 말풍선. 아이콘은 같은 케이크. 저장·수정 저장 때 **고른 감정 얼굴**과 **일기 글**과 닉네임(`displayNickname`, 비어 있으면 `마음조각`)을 Claude에 보냅니다. 라벨은 그 감정 이름(아주 좋음·슬픔 등)을 쓰고, 문구는 일기의 말·상황을 받은 뒤 공감 + 작은 행동 하나입니다. 모델이 감정을 바꿔 말해도 서버/클라이언트가 고른 감정 이름으로 맞춥니다. 실패하면 `src/content/detailAi.ts` 폴백(일기 한 줄을 앞에 붙임). 고친 데이터 기준 피드백이 상세에 보입니다.
 
 ## 감정 아이콘
 
@@ -111,7 +105,7 @@ Figma 얼굴을 `src/assets/emotions/*.svg`로 두고 `EmotionIcon`이 `<img>`�
 
 ## 로컬에서 실행
 
-필요: Node.js 20+. 홈·통계·설정·이메일 가입/로그인은 환경 변수 없이 이 브라우저 localStorage만으로 동작합니다. Claude 문구를 쓰려면 Anthropic API 키.
+필요: Node.js 20+. Claude 문구를 쓰려면 Anthropic API 키. 이메일 가입/로그인은 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
 
 ```bash
 npm install
@@ -127,12 +121,11 @@ npm run dev
 
 ```
 ANTHROPIC_API_KEY=
-# 이후 Supabase를 붙일 때
-# VITE_SUPABASE_URL=
-# VITE_SUPABASE_ANON_KEY=
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
 ```
 
-Claude 키는 서버만 씁니다. 프론트(`VITE_`)와 커밋에 넣지 않습니다. Vercel에도 같은 이름으로 서버 환경 변수를 넣습니다.
+Claude 키는 서버만 씁니다. 프론트(`VITE_`)와 커밋에 넣지 않습니다. Supabase anon/publishable 키는 프론트에 넣고, RLS가 본인 행만 열어둡니다. Vercel에도 같은 이름을 넣습니다. `VITE_`는 빌드에 들어가므로 값을 바꾼 뒤 다시 배포합니다.
 
 ## 스크립트
 
@@ -162,7 +155,8 @@ Claude 키는 서버만 씁니다. 프론트(`VITE_`)와 커밋에 넣지 않습
 | 회원가입 화면 한/영 문구 | `src/screens/Signup.tsx`의 `COPY` |
 | 홈·통계 한/영 문구(달력, 감정 분석, 기간, 기록) | `src/content/uiCopy.ts` |
 | 케이크 카드 이름 | `src/theme/cakes.ts`의 `labelKo` / `labelEn` |
-| 비밀번호 눈 아이콘 | `src/assets/icons` |
+| 비밀번호 눈·프로필 잠금/연필/아바타 | `src/assets/icons` |
+| 닉네임 기본값 | `src/platform/auth.ts`의 `DEFAULT_NICKNAME` / `displayNickname` |
 | 홈 AI 팁 문구 풀(폴백) | `src/content/homeTips.ts` |
 | 기록 상세 AI 폴백 | `src/content/detailAi.ts` |
 | Claude 호출 | `api/ai-copy.ts`, 화면은 `src/platform/aiCopy.ts` |
@@ -176,21 +170,21 @@ Claude 키는 서버만 씁니다. 프론트(`VITE_`)와 커밋에 넣지 않습
 - `src/components` — 하단 탭, 감정 그리드, 작성 폼, `ThemeCakeIcon`
 - `src/theme` — 색/간격/라운드/글자 + 케이크 2종
 - `src/domain` — Emotion, Entry, ThemeId, Locale
-- `src/platform` — Auth/Entry/File/AI 포트. 지금은 계정·게스트 기록 모두 localStorage, 이후 로그인=supabase
+- `src/platform` — Auth/Entry/AI. 로그인=supabase, 게스트 기록=localStorage
 - `src/content` — 홈 팁, 한/영 UI 문구, 상세 AI 폴백
 - `src/hooks` — `useLocale`, 작성 폼
 - `src/lib` — 날짜, 통계, `navFrom`
 - `api` — `/api/ai-copy` (Vercel 함수 한 파일. 로컬은 Vite가 같은 경로로 연결)
 - `src/assets/emotions` — 감정 8종 SVG
 - `src/assets/cakes` — 생크림, 치즈 (Figma 설정 화면과 같은 그림)
-- `src/assets/icons` — 비밀번호 보기/숨기기 눈
+- `src/assets/icons` — 비밀번호 보기/숨기기 눈, 로그인 설정 잠금·연필·아바타·chevron
 
 ## 디자인
 
 Figma는 구현의 출발점입니다. 설정 테마 카드는 [Setting (Logged Out)](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-561)의 케이크 2종을 씁니다.
 
 - 화면/IA: [ver.3](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-554)
-- 설정: [Setting (Logged Out)](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-561)
+- 설정: [Setting (Logged Out)](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-561), 로그인 후 프로필은 [Setting (Logged In)](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-403) (테마·언어는 기존 케이크/칩 유지)
 - 회원가입: [Setting (Signup)](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=187-4) 인트로 두 줄은 가운데 정렬
 - 케이크 테마 색: [Cake Themes](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=19-63)
 - 홈 감정 그리드: [45:23](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-23)
@@ -198,6 +192,16 @@ Figma는 구현의 출발점입니다. 설정 테마 카드는 [Setting (Logged 
 - 매우 나쁨 얼굴: [45:55](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-55)
 - 홈 AI 한 줄: [ai-feedback-row](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-68)
 - 기록 상세 AI 분석: [ai-section](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=56-28)
+
+## 문서
+
+개발 히스토리·계획·의사결정은 `docs/`에 마크다운으로 쌓습니다. 규칙은 [DOCS.md](DOCS.md)입니다. `docs/`는 gitignore라 GitHub에는 올라가지 않습니다.
+
+- 실행 로그: `docs/20-execution/logs/`
+- 의사결정: `docs/20-execution/decisions/`
+- 현재 산출물 요약: `docs/30-deliverables/`
+
+앱이 지금 어떻게 동작하는지는 이 README가 기준입니다. 문서는 과거와 결정을 남기고, 같은 내용을 두 곳에 길게 쓰지 않습니다.
 
 ## 배포 (Vercel, 수동만)
 
@@ -213,10 +217,11 @@ npx vercel --prod # 프로덕션
 - 프레임워크 프리셋 Vite, 출력 `dist`
 - `vercel.json` rewrite: API가 아닌 경로는 `/index.html` (SPA)
 - 서버 환경 변수 `ANTHROPIC_API_KEY` (없으면 AI는 폴백)
-- 이후 Supabase를 붙이면 `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`와 Redirect URL에 Vercel 도메인
+- `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` (이메일 가입/로그인. 빌드 때 들어감)
 
 ## 이후
 
 - 구글/카카오 로그인
+- 비밀번호 변경·회원 탈퇴
 - 사진·음성 업로드 (Storage)
 - Capacitor로 iOS/Android 래핑

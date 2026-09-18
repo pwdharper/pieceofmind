@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { BottomNav } from "../components/BottomNav";
+import { hydrateApp } from "../platform/auth";
 import { EditEntry } from "../screens/EditEntry";
 import { EntryDetail } from "../screens/EntryDetail";
 import { Home } from "../screens/Home";
@@ -11,6 +13,21 @@ import { PhoneShell } from "../shell/PhoneShell";
 export function App() {
   const { pathname } = useLocation();
   const showNav = pathname !== "/signup" && !pathname.endsWith("/edit");
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    void hydrateApp()
+      .catch(() => undefined)
+      .then(() => {
+        if (alive) setReady(true);
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  if (!ready) return null;
 
   return (
     <PhoneShell>

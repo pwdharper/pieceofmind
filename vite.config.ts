@@ -40,5 +40,9 @@ export default defineConfig(({ mode }) => {
   if (env.ANTHROPIC_API_KEY) process.env.ANTHROPIC_API_KEY = env.ANTHROPIC_API_KEY;
   return {
     plugins: [react(), aiCopyPlugin()],
+    server: {
+      host: "127.0.0.1",
+      port: 5173,
+    },
   };
 });

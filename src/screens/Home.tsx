@@ -11,7 +11,7 @@ import { useLocale } from "../hooks/useLocale";
 import { dateFromKey, formatDateLabel, isDateKey } from "../lib/formatDate";
 import { readNavFrom } from "../lib/navFrom";
 import { requestDetailAi, requestHomeTip } from "../platform/aiCopy";
-import { getSession } from "../platform/auth";
+import { displayNickname, getSession } from "../platform/auth";
 import { getByDate, todayKey, upsertEntry } from "../platform/localEntries";
 
 export function Home() {
@@ -63,9 +63,9 @@ function HomeComposer({ date }: { date: string }) {
         locale,
         composer.emotion,
         composer.text.trim(),
-        getSession()?.nickname,
+        displayNickname(getSession(), locale),
       );
-      const entry = upsertEntry({
+      const entry = await upsertEntry({
         date,
         emotion: composer.emotion,
         text: composer.text.trim(),

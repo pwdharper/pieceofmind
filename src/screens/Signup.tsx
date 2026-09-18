@@ -25,6 +25,9 @@ const COPY = {
     invalidEmail: "이메일 형식을 확인해 주세요.",
     shortPassword: "비밀번호는 6자 이상이어야 해요.",
     emailTaken: "이미 가입된 이메일이에요.",
+    confirmEmail: "이메일 확인 링크를 누른 뒤 로그인해 주세요.",
+    unavailable: "계정 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.",
+    invalidCredentials: "이메일 또는 비밀번호를 확인해 주세요.",
   },
   en: {
     title: "Sign up",
@@ -43,6 +46,9 @@ const COPY = {
     invalidEmail: "Check the email format.",
     shortPassword: "Password must be at least 6 characters.",
     emailTaken: "That email is already registered.",
+    confirmEmail: "Confirm the email link, then log in.",
+    unavailable: "Can’t reach the account server. Try again shortly.",
+    invalidCredentials: "Check the email or password.",
   },
 } as const;
 
@@ -73,6 +79,9 @@ export function Signup() {
           email_taken: t.emailTaken,
           no_account: t.needFields,
           bad_password: t.needFields,
+          invalid_credentials: t.invalidCredentials,
+          confirm_email: t.confirmEmail,
+          unavailable: t.unavailable,
         } as const;
         setNote(notes[error.code]);
         return;

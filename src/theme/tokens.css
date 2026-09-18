@@ -15,6 +15,9 @@
   --photo-hero: 280px;
   --count: #8c8780;
   --danger: #c45c4a;
+  --profile-avatar: #fff5f4;
+  --profile-badge-bg: #faf0ed;
+  --profile-badge: #f07b75;
   --emotion-very-good: #e4b423;
   --emotion-good: #6aa37a;
   --emotion-calm: #e3879b;
@@ -36,6 +39,7 @@
   --font-page: 20px;
   --font-brand: 18px;
   --font-body: 14px;
+  --font-input: 16px;
   --font-small: 13px;
   --font-tiny: 11px;
   --shell-width: 402px;
@@ -47,6 +51,12 @@
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  touch-action: manipulation;
 }
 
 html,
@@ -67,6 +77,12 @@ button,
 textarea,
 input {
   font: inherit;
+}
+
+input:not([type="file"]):not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+textarea,
+select {
+  font-size: var(--font-input);
 }
 
 button {

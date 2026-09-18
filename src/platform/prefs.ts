@@ -2,16 +2,10 @@ import { LOCALES, THEME_IDS, type Locale, type ThemeId } from "../domain/types";
 import { applyCake } from "../theme/cakes";
 
 const PREFS_KEY = "pom.prefs";
-const SESSION_KEY = "pom.session";
 
 type Prefs = {
   themeId: ThemeId;
   locale: Locale;
-};
-
-export type Session = {
-  email: string;
-  nickname?: string;
 };
 
 const DEFAULTS: Prefs = { themeId: "cream", locale: "ko" };
@@ -63,26 +57,6 @@ export function setLocale(locale: Locale) {
 export function subscribeLocale(listener: () => void) {
   window.addEventListener(LOCALE_EVENT, listener);
   return () => window.removeEventListener(LOCALE_EVENT, listener);
-}
-
-export function getSession(): Session | null {
-  try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as Session;
-    return parsed.email ? parsed : null;
-  } catch {
-    return null;
-  }
-}
-
-export function setSession(email: string, nickname?: string) {
-  const name = nickname?.trim();
-  localStorage.setItem(SESSION_KEY, JSON.stringify(name ? { email, nickname: name } : { email }));
-}
-
-export function clearSession() {
-  localStorage.removeItem(SESSION_KEY);
 }
 
 export function hydrateTheme() {

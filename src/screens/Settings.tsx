@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { cakeImages } from "../assets/cakes";
-import { eyeIcons } from "../assets/icons";
+import { eyeIcons, profileIcons } from "../assets/icons";
 import { AppHeader } from "../components/AppHeader";
 import type { Locale } from "../domain/types";
-import { AuthError, getSession, signIn, signOut } from "../platform/auth";
+import { consecutiveStreak, monthCompletionPercent } from "../lib/insightStats";
+import { AuthError, DEFAULT_NICKNAME, displayNickname, getSession, signIn, signOut, updateNickname } from "../platform/auth";
+import { listEntries, todayKey } from "../platform/localEntries";
 import { getPrefs, setLocale, setThemeId } from "../platform/prefs";
 import { CAKES } from "../theme/cakes";
 import "./Settings.css";
@@ -36,11 +38,23 @@ const COPY = {
     shortPassword: "비밀번호는 6자 이상이어야 해요.",
     missingAccount: "가입된 계정이 없어요. 먼저 회원가입을 해 주세요.",
     badPassword: "비밀번호가 올바르지 않아요.",
+    invalidCredentials: "이메일 또는 비밀번호를 확인해 주세요.",
+    confirmEmail: "이메일 확인 링크를 누른 뒤 로그인해 주세요.",
+    unavailable: "계정 서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.",
     resetHint: "재설정 메일은 아직 보내지 않아요. 이메일을 확인해 주세요.",
     signedIn: "으로 로그인되어 있어요.",
     logout: "로그아웃",
-    welcome: "오늘의 조각을 안전하게 보관 중이에요.",
+    welcome: "로그인한 기기의 조각이 계정에 모여요.",
     hasAccount: "이미 계정이 있으신가요?",
+    member: "일반 회원",
+    nickname: "닉네임",
+    editNickname: "닉네임 수정",
+    changePassword: "비밀번호 변경",
+    activity: "활동",
+    streakLabel: "현재 연속 기록일",
+    totalLabel: "총 기록 일수",
+    monthLabel: "이달 달성",
+    leave: "회원 탈퇴",
   },
   en: {
     title: "Settings",
@@ -66,11 +80,23 @@ const COPY = {
     shortPassword: "Password must be at least 6 characters.",
     missingAccount: "No account yet. Please sign up first.",
     badPassword: "That password is incorrect.",
+    invalidCredentials: "Check the email or password.",
+    confirmEmail: "Confirm the email link, then log in.",
+    unavailable: "Can’t reach the account server. Try again shortly.",
     resetHint: "Reset email is not sent yet. Check the address you entered.",
     signedIn: "is signed in.",
     logout: "Log out",
-    welcome: "Your pieces are kept on this device for now.",
+    welcome: "Your pieces stay with this account on any device.",
     hasAccount: "Already have an account?",
+    member: "Member",
+    nickname: "Nickname",
+    editNickname: "Edit nickname",
+    changePassword: "Change password",
+    activity: "Activity",
+    streakLabel: "Current streak",
+    totalLabel: "Total days",
+    monthLabel: "This month",
+    leave: "Delete account",
   },
 } as const;
 
@@ -84,9 +110,15 @@ export function Settings() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [nicknameDraft, setNicknameDraft] = useState(() => displayNickname(getSession(), prefs.locale));
   const [note, setNote] = useState<string | null>(null);
   const [noteDanger, setNoteDanger] = useState(false);
+  const nicknameRef = useRef<HTMLInputElement>(null);
   const t = COPY[locale];
+  const entries = listEntries();
+  const streak = consecutiveStreak(entries, todayKey());
+  const totalPieces = entries.length;
+  const monthPercent = monthCompletionPercent(entries);
 
   const AUTH_NOTES = {
     need_fields: t.needFields,
@@ -95,6 +127,9 @@ export function Settings() {
     no_account: t.missingAccount,
     bad_password: t.badPassword,
     email_taken: t.missingAccount,
+    invalid_credentials: t.invalidCredentials,
+    confirm_email: t.confirmEmail,
+    unavailable: t.unavailable,
   } as const;
 
   function showNote(text: string, danger = false) {
@@ -106,6 +141,7 @@ export function Settings() {
     try {
       const next = await signIn(email, password);
       setSessionState(next);
+      setNicknameDraft(displayNickname(next, locale));
       setNote(null);
       setNoteDanger(false);
       setPassword("");
@@ -119,10 +155,12 @@ export function Settings() {
     }
   }
 
-  function onLogout() {
-    signOut();
+  async function onLogout() {
+    await signOut();
     setSessionState(null);
     setMode("login");
+    setNote(null);
+    setNoteDanger(false);
   }
 
   function onReset() {
@@ -133,24 +171,115 @@ export function Settings() {
     showNote(t.resetHint);
   }
 
+  async function onSaveNickname(raw = nicknameDraft) {
+    if (!session) return;
+    const trimmed = raw.trim();
+    const stored = !trimmed || trimmed === DEFAULT_NICKNAME.ko || trimmed === DEFAULT_NICKNAME.en ? "" : trimmed;
+    if (stored === (session.nickname ?? "")) {
+      setNicknameDraft(displayNickname(session, locale));
+      return;
+    }
+    try {
+      const next = await updateNickname(raw);
+      setSessionState(next);
+      setNicknameDraft(displayNickname(next, locale));
+    } catch (error) {
+      if (error instanceof AuthError) {
+        showNote(AUTH_NOTES[error.code], true);
+        setNicknameDraft(displayNickname(session, locale));
+        return;
+      }
+      throw error;
+    }
+  }
+
   return (
     <>
       <AppHeader title={t.title} />
       <main className="settings-main">
         {session ? (
-          <section className="settings-card">
-            <div className="settings-intro">
-              <p className="settings-brand">{t.brand}</p>
-              <p className="settings-sub">{t.welcome}</p>
-              {session.nickname ? <p className="settings-email-line">{session.nickname}</p> : null}
-              <p className="settings-email-line">
-                {session.email} {t.signedIn}
-              </p>
-            </div>
-            <button type="button" className="settings-login-btn" onClick={onLogout}>
-              {t.logout}
+          <>
+            <section className="settings-card is-profile">
+              <div className="profile-header">
+                <div className="profile-avatar">
+                  <img src={profileIcons.user} alt="" width={28} height={28} />
+                </div>
+                <div className="profile-who">
+                  <div className="profile-name-row">
+                    <p className="profile-name">{displayNickname(session, locale)}</p>
+                    <span className="profile-badge">{t.member}</span>
+                  </div>
+                  <p className="profile-email">{session.email}</p>
+                </div>
+              </div>
+
+              <hr className="profile-rule" />
+
+              <div className="profile-fields">
+                <div className="profile-row">
+                  <div className="profile-row-main">
+                    <span>{t.email}</span>
+                    <p className="profile-row-value is-locked">{session.email}</p>
+                  </div>
+                  <img className="profile-row-icon" src={profileIcons.lock} alt="" width={14} height={14} />
+                </div>
+                <div className="profile-row">
+                  <label className="profile-row-main">
+                    <span>{t.nickname}</span>
+                    <input
+                      ref={nicknameRef}
+                      value={nicknameDraft}
+                      autoComplete="nickname"
+                      onChange={(event) => setNicknameDraft(event.target.value)}
+                      onBlur={(event) => void onSaveNickname(event.currentTarget.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") event.currentTarget.blur();
+                      }}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    className="profile-icon-btn"
+                    aria-label={t.editNickname}
+                    onClick={() => nicknameRef.current?.focus()}
+                  >
+                    <img src={profileIcons.pen} alt="" width={14} height={14} />
+                  </button>
+                </div>
+                <button type="button" className="profile-link-row" onClick={() => showNote(t.later)}>
+                  <span>{t.changePassword}</span>
+                  <img src={profileIcons.chevron} alt="" width={14} height={14} />
+                </button>
+              </div>
+
+              <button type="button" className="settings-logout-btn" onClick={() => void onLogout()}>
+                {t.logout}
+              </button>
+
+              <div className="profile-stats">
+                <hr className="profile-rule" />
+                <p className="profile-stats-kicker">{t.activity}</p>
+                <div className="profile-stats-row">
+                  <div className="profile-stat">
+                    <p>{t.streakLabel}</p>
+                    <strong>{locale === "ko" ? `${streak}일 연속` : `${streak}-day streak`}</strong>
+                  </div>
+                  <div className="profile-stat">
+                    <p>{t.totalLabel}</p>
+                    <strong>{locale === "ko" ? `${totalPieces}조각` : `${totalPieces} pieces`}</strong>
+                  </div>
+                  <div className="profile-stat is-month">
+                    <p>{t.monthLabel}</p>
+                    <strong>{monthPercent}%</strong>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <button type="button" className="profile-leave" onClick={() => showNote(t.later)}>
+              {t.leave}
             </button>
-          </section>
+            {note ? <p className={`settings-note${noteDanger ? " is-danger" : ""}`}>{note}</p> : null}
+          </>
         ) : (
           <section className="settings-card">
             <div className="settings-intro">

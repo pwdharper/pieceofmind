@@ -9,7 +9,7 @@ import { useLocale } from "../hooks/useLocale";
 import { dateFromKey, formatDateLabel } from "../lib/formatDate";
 import { originPath, originState, readNavFrom } from "../lib/navFrom";
 import { requestDetailAi } from "../platform/aiCopy";
-import { getSession } from "../platform/auth";
+import { displayNickname, getSession } from "../platform/auth";
 import { getById, upsertEntry } from "../platform/localEntries";
 
 export function EditEntry() {
@@ -55,9 +55,9 @@ function EditForm({
         locale,
         composer.emotion,
         composer.text.trim(),
-        getSession()?.nickname,
+        displayNickname(getSession(), locale),
       );
-      const saved = upsertEntry({
+      const saved = await upsertEntry({
         id: entry.id,
         date: entry.date,
         emotion: composer.emotion,

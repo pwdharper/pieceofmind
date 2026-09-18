@@ -16,6 +16,239 @@
   background: var(--bg);
 }
 
+.settings-card.is-profile {
+  gap: 28px;
+  padding: 16px 24px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.profile-avatar {
+  flex-shrink: 0;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 27px;
+  background: var(--profile-avatar);
+}
+
+.profile-who {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.profile-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-name {
+  margin: 0;
+  font-size: var(--font-brand);
+  font-weight: 800;
+}
+
+.profile-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--profile-badge-bg);
+  color: var(--profile-badge);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.profile-email {
+  margin: 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: var(--font-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-rule {
+  margin: 0;
+  width: 100%;
+  border: 0;
+  border-top: 1px solid var(--card-border);
+}
+
+.profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.profile-row,
+.profile-link-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+}
+
+.profile-row {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.profile-row-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-row-main span {
+  flex-shrink: 0;
+  width: 80px;
+  color: var(--muted);
+  font-size: var(--font-body);
+  font-weight: 700;
+}
+
+.profile-row-value,
+.profile-row-main input {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font-size: var(--font-input);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  outline: none;
+}
+
+.profile-row-value.is-locked {
+  color: var(--card-border);
+  font-size: var(--font-body);
+}
+
+.profile-row-main input {
+  color: var(--text);
+}
+
+.profile-row-icon {
+  flex-shrink: 0;
+  display: block;
+}
+
+.profile-icon-btn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-link-row {
+  color: var(--text);
+  font-size: var(--font-body);
+  font-weight: 700;
+  text-align: left;
+}
+
+.profile-link-row img,
+.profile-icon-btn img {
+  display: block;
+}
+
+.settings-logout-btn {
+  width: 100%;
+  min-height: 44px;
+  padding: 12px 16px;
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  background: var(--login-fill);
+  color: var(--text);
+  font-size: var(--font-body);
+  font-weight: 700;
+}
+
+.profile-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.profile-stats-kicker {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-small);
+  font-weight: 700;
+}
+
+.profile-stats-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.profile-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  min-width: 0;
+  text-align: center;
+}
+
+.profile-stat p,
+.profile-stat strong {
+  margin: 0;
+}
+
+.profile-stat p {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.profile-stat strong {
+  color: var(--text);
+  font-size: var(--font-page);
+  font-weight: 800;
+}
+
+.profile-stat.is-month p {
+  color: #aca4b3;
+}
+
+.profile-stat.is-month strong {
+  color: #3e3842;
+  font-size: var(--font-brand);
+  font-weight: 700;
+}
+
+.profile-leave {
+  align-self: flex-end;
+  color: var(--muted);
+  font-size: var(--font-small);
+  font-weight: 700;
+  text-decoration: underline;
+}
+
 .settings-intro {
   display: flex;
   flex-direction: column;
@@ -93,7 +326,7 @@
   padding: 0;
   background: transparent;
   color: var(--text);
-  font-size: var(--font-body);
+  font-size: var(--font-input);
   outline: none;
 }
 
