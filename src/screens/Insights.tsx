@@ -73,12 +73,23 @@ export function Insights() {
       <AppHeader title={t.title} size="page" />
       <main className="insights-main" ref={exportRef}>
         <div className="insights-download-row">
-          <button type="button" className="insights-download" onClick={onSaveImage} disabled={saving}>
+          <p className="insights-brand">Piece of Mind</p>
+          <button
+            type="button"
+            className="insights-download"
+            data-export-hide
+            onClick={onSaveImage}
+            disabled={saving}
+          >
             <DownloadIcon />
             {saving ? t.saving : t.saveImage}
           </button>
         </div>
-        {saveNote ? <p className="insights-save-note">{saveNote}</p> : null}
+        {saveNote ? (
+          <p className="insights-save-note" data-export-hide>
+            {saveNote}
+          </p>
+        ) : null}
 
         <section className="insights-block">
           <p className="calendar-kicker">{t.calendar}</p>

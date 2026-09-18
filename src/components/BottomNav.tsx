@@ -1,13 +1,24 @@
+import { useLayoutEffect, useRef } from "react";
 import { matchPath, NavLink, useLocation } from "react-router-dom";
 import { UI } from "../content/uiCopy";
 import { useLocale } from "../hooks/useLocale";
 import { readNavFrom } from "../lib/navFrom";
+import { scrollShellToTop } from "../lib/scrollShell";
 import "./chrome.css";
 
 export function BottomNav() {
   const location = useLocation();
+  const pendingTop = useRef(false);
   const t = UI[useLocale()].nav;
-  if (location.pathname === "/signup" || location.pathname.endsWith("/edit")) return null;
+  const hide = location.pathname === "/signup" || location.pathname.endsWith("/edit");
+
+  useLayoutEffect(() => {
+    if (hide || !pendingTop.current) return;
+    pendingTop.current = false;
+    scrollShellToTop();
+  }, [hide, location.pathname, location.key]);
+
+  if (hide) return null;
 
   const onDetail = Boolean(matchPath({ path: "/entries/:id", end: true }, location.pathname));
   const from = readNavFrom(location.state);
@@ -17,6 +28,11 @@ export function BottomNav() {
     { to: "/settings", label: t.settings, end: false, icon: GearIcon, key: "settings" },
   ] as const;
 
+  function handleTabClick() {
+    pendingTop.current = true;
+    scrollShellToTop();
+  }
+
   return (
     <nav className="bottom-nav" aria-label={t.menu}>
       {tabs.map((tab) => (
@@ -24,6 +40,7 @@ export function BottomNav() {
           key={tab.to}
           to={tab.to}
           end={tab.end}
+          onClick={handleTabClick}
           className={({ isActive }) => {
             const onThisOrigin = onDetail && tab.key === from;
             return isActive || onThisOrigin ? "nav-tab is-active" : "nav-tab";

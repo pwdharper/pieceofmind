@@ -12,7 +12,7 @@
 - 홈: 날짜, 감정 2×4(화면 라벨 없음, 접근성 이름은 아래 8종), 일기(200자), 사진, 음성(Web Speech, 언어 설정에 따라 `ko-KR`/`en-US` → 입력란, 버튼은 한국어 `말로 작성` / 영어 `Voice to Text`), 저장. 아직 없는 날을 처음 쓸 때만 하단 안내 한 줄(Claude, 실패 시 한/영 풀). 안내 아이콘은 설정에서 고른 케이크. 이메일·비밀번호·닉네임 입력은 16px이라 iOS가 확대하지 않음
 - 기록 상세: 그날의 감정 얼굴, 글, 사진, Claude 분석(실패 시 로컬 폴백). 라벨은 `'{이름}' {n}% 포착` (앞에 `AI 분석 :` 없음). 아이콘은 고른 케이크. 홈에서 보면 수정만, 통계에서 보면 뒤로/수정/닫기
 - 기록 수정: 같은 날 감정·글·사진을 고침. 저장하면 기록 상세로 가고, AI는 **그때 고른 감정 얼굴과 일기 글**을 기준으로 다시 붙임. 이미 저장된 분석은 다시 저장해야 바뀜
-- 통계: 달력(기록 있는 날에 감정 얼굴), 감정 분석(원형 그래프, 기간 이번주/이번달/올해). 한/영은 설정 언어(달력·감정 분석·기록·빈 상태 문구). 화면 이미지 저장. 없는 날을 누르면 그 날짜 작성 화면(홈과 같은 안내 한 줄)
+- 통계: 달력(기록 있는 날에 감정 얼굴), 감정 분석(원형 그래프, 기간 이번주/이번달/올해). 한/영은 설정 언어(달력·감정 분석·기록·빈 상태 문구). `이미지 저장`과 같은 줄에 `Piece of Mind` 가운데 정렬. 저장 PNG에는 타이틀·달력·분석이 들어가고 저장 버튼은 빠지며, 카드·드롭다운·원형 그래프 색은 화면과 같음. 없는 날을 누르면 그 날짜 작성 화면(홈과 같은 안내 한 줄)
 - 설정: 이메일 로그인(Supabase). 없는 계정·틀린 비밀번호는 빨간 안내. 구글/카카오는 “곧 연결할게요.”, 테마(생크림/치즈)·언어는 로그인 전후 같은 UI. 이메일·비밀번호는 한 줄 입력, 비밀번호는 기본 마스킹이고 눈 아이콘으로 보기/숨기기. 로그인되면 프로필(아바타·닉네임·일반 회원·이메일), 이메일은 잠금·수정 불가, 닉네임은 연필로 수정(비어 있으면 `마음조각`). 비밀번호 변경·회원 탈퇴는 “곧 연결할게요.” 활동은 연속 기록일·총 조각·이달 달성
 - 회원가입(`/signup`): Figma 회원가입 화면. 인트로(함께 기분을 맞춰볼까요?)는 가운데 정렬. 이메일·비밀번호(6자 이상) 필수, 닉네임 선택. 이미 있는 이메일은 거절. 하단 탭·테마·언어 없음. 가입 후 설정으로 감. 이미 로그인돼 있으면 설정으로 보냄. 예전 이 기기 `pom.accounts`는 쓰지 않음(다시 가입)
 
@@ -34,7 +34,7 @@
 | `/entries/:id` | 기록 상세 | 있음 |
 | `/entries/:id/edit` | 기록 수정 | 없음 |
 
-- 탭: 홈 ↔ 통계 ↔ 설정. 기록 상세에서는 들어온 곳(홈/통계) 탭이 켜짐
+- 탭: 홈 ↔ 통계 ↔ 설정. 기록 상세에서는 들어온 곳(홈/통계) 탭이 켜짐. 하단 탭으로 화면을 바꾸면 스크롤은 맨 위
 - 홈에서 저장하면 기록 상세. 수정에서 저장해도 기록 상세(통계에서 고친 뒤에도 통계로 바로 돌아가지 않음)
 - 이미 저장된 날의 홈/하단 홈 탭도 기록 상세
 - 통계 달력에서 기록이 있는 날 → 기록 상세. 없는 날 → 그 날짜 작성 화면
@@ -145,6 +145,8 @@ Claude 키는 서버만 씁니다. 프론트(`VITE_`)와 커밋에 넣지 않습
 | 감정 칸 기본 크기 | `src/theme/tokens.css` (`--emotion-size`) |
 | 감정 칸 열 수 | `src/components/EmotionGrid` |
 | 하단 탭 | `src/components/BottomNav` |
+| 하단 탭으로 바꿀 때 스크롤 맨 위 | `src/lib/scrollShell.ts` |
+| 통계 이미지 저장 | `src/lib/saveNodePng.ts`, `src/screens/Insights.tsx` |
 | 저장 버튼 모양 | `src/components/AppButton` |
 | 홈 블록 순서 | `src/screens/Home`에서 컴포넌트 줄 순서 |
 | 페이지 이동 | `src/app/App.tsx`, 각 화면의 `navigate(...)`, `src/lib/navFrom.ts` |
@@ -173,7 +175,7 @@ Claude 키는 서버만 씁니다. 프론트(`VITE_`)와 커밋에 넣지 않습
 - `src/platform` — Auth/Entry/AI. 로그인=supabase, 게스트 기록=localStorage
 - `src/content` — 홈 팁, 한/영 UI 문구, 상세 AI 폴백
 - `src/hooks` — `useLocale`, 작성 폼
-- `src/lib` — 날짜, 통계, `navFrom`
+- `src/lib` — 날짜, 통계, `navFrom`, 통계 PNG(`saveNodePng`), 하단 탭 스크롤(`scrollShell`)
 - `api` — `/api/ai-copy` (Vercel 함수 한 파일. 로컬은 Vite가 같은 경로로 연결)
 - `src/assets/emotions` — 감정 8종 SVG
 - `src/assets/cakes` — 생크림, 치즈 (Figma 설정 화면과 같은 그림)
@@ -192,6 +194,7 @@ Figma는 구현의 출발점입니다. 설정 테마 카드는 [Setting (Logged 
 - 매우 나쁨 얼굴: [45:55](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-55)
 - 홈 AI 한 줄: [ai-feedback-row](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-68)
 - 기록 상세 AI 분석: [ai-section](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=56-28)
+- 통계 저장 줄 `Piece of Mind`: [45:557](https://www.figma.com/design/fXf0CZ7VxsYwStByYCuzRA?node-id=45-557)
 
 ## 문서
 

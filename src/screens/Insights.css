@@ -7,8 +7,23 @@
 }
 
 .insights-download-row {
+  position: relative;
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  min-height: 28px;
+}
+
+.insights-brand {
+  position: absolute;
+  left: 50%;
+  margin: 0;
+  transform: translateX(-50%);
+  font-size: var(--font-brand);
+  font-weight: 800;
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
 }
 
 .insights-download {
